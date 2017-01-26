@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"net/url"
 )
@@ -16,6 +17,9 @@ const (
 
 // NewClient returns a new Mitake API client.
 func NewClient(username, password string, httpClient *http.Client) *Client {
+	if username == "" || password == "" {
+		log.Fatal("username or password cannot be empty")
+	}
 	if httpClient == nil {
 		httpClient = http.DefaultClient
 	}
