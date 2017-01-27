@@ -45,6 +45,7 @@ type Client struct {
 	UserAgent string
 }
 
+// checkErrorResponse checks the API response for errors.
 func checkErrorResponse(r *http.Response) error {
 	if c := r.StatusCode; 200 <= c && c <= 299 {
 		if r.ContentLength == 0 {
@@ -57,6 +58,8 @@ func checkErrorResponse(r *http.Response) error {
 	}
 }
 
+// If the returned error is nil, the Response will contain a non-nil
+// Body which the user is expected to close.
 func (c *Client) Do(req *http.Request) (*http.Response, error) {
 	resp, err := c.client.Do(req)
 	if err != nil {
