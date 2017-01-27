@@ -24,15 +24,37 @@ client := mitake.NewClient("USERNAME", "PASSWORD", nil)
 
 // Retrieving your account balance
 balance, err := client.QueryAccountPoint()
+```
 
-// Send an SMS
+Send an SMS:
+
+```go
 message := mitake.Message{
     Dstaddr: "0987654321",
     Smbody:  "Test SMS",
 }
 
 response, err := client.Send(message)
+```
 
+Send multiple SMS:
+
+```go
+messages := []mitake.Message{
+    {
+        Dstaddr: "0987654321",
+        Smbody:  "Test SMS",
+    },
+    // ...
+}
+
+response, err := client.SendBatch(messages)
+```
+
+Query the status of messages:
+
+```go
+response, err := err := client.QueryMessageStatus([]string{"MESSAGE_ID1", "MESSAGE_ID2"})
 ```
 
 ## License
