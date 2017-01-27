@@ -2,7 +2,9 @@ package mitake
 
 import (
 	"bufio"
+	"errors"
 	"io"
+	"net/http"
 	"regexp"
 	"strconv"
 	"strings"
@@ -164,4 +166,41 @@ func parseMessageStatusResponse(body io.Reader) (*MessageStatusResponse, error) 
 		return nil, err
 	}
 	return response, nil
+}
+
+// Message delivery receipt.
+type MessageReceipt struct {
+	Msgid      string     `json:"msgid"`
+	Dstaddr    string     `json:"dstaddr"`
+	Dlvtime    string     `json:"dlvtime"`
+	Donetime   string     `json:"donetime"`
+	Statuscode StatusCode `json:"statuscode"`
+	Statusstr  string     `json:"statusstr"`
+	StatusFlag string     `json:"StatusFlag"`
+}
+
+// Parse an incoming Mitake callback request and return the MessageReceipt.
+//
+// Example usage:
+//
+// 	func Callback(w http.ResponseWriter, r *http.Request) {
+// 		receipt, err := mitake.ParseMessageReceipt(r)
+// 		if err != nil { ... }
+//		// Process message receipt
+// 	}
+//
+func ParseMessageReceipt(r *http.Request) (*MessageReceipt, error) {
+	values := r.URL.Query()
+	if values.Get("msgid") == "" {
+		return nil, errors.New("receipt not found")
+	}
+	return &MessageReceipt{
+		Msgid:      values.Get("msgid"),
+		Dstaddr:    values.Get("dstaddr"),
+		Dlvtime:    values.Get("dlvtime"),
+		Donetime:   values.Get("donetime"),
+		Statuscode: StatusCode(values.Get("statuscode")),
+		Statusstr:  values.Get("statusstr"),
+		StatusFlag: values.Get("StatusFlag"),
+	}, nil
 }
