@@ -1,6 +1,15 @@
 # go-mitake
 
-go-mitake is a Go client library for accessing the Mitake SMS API.
+[![Build Status](https://travis-ci.org/minchao/go-mitake.svg?branch=master)](https://travis-ci.org/minchao/go-mitake)
+[![Go Report Card](https://goreportcard.com/badge/github.com/minchao/go-mitake)](https://goreportcard.com/report/github.com/minchao/go-mitake)
+
+go-mitake is a Go client library for accessing the Mitake SMS API (Taiwan mobile phone number only).
+
+## Installation
+
+```bash
+go get github.com/minchao/go-mitake
+```
 
 ## Usage
 
