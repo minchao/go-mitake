@@ -95,8 +95,8 @@ func (m Message) ToINI() string {
 }
 
 type MessageResult struct {
-	MessageId  string     `json:"msgid"`
-	StatusCode StatusCode `json:"statuscode"`
+	Msgid      string     `json:"msgid"`
+	Statuscode StatusCode `json:"statuscode"`
 }
 
 type MessageResponse struct {
@@ -120,9 +120,9 @@ func parseMessageResponse(body io.Reader) (*MessageResponse, error) {
 			strs := strings.Split(text, "=")
 			switch strs[0] {
 			case "msgid":
-				result.MessageId = strs[1]
+				result.Msgid = strs[1]
 			case "statuscode":
-				result.StatusCode = StatusCode(strs[1])
+				result.Statuscode = StatusCode(strs[1])
 			case "AccountPoint":
 				response.AccountPoint, _ = strconv.Atoi(strs[1])
 			}
@@ -154,8 +154,8 @@ func parseMessageStatusResponse(body io.Reader) (*MessageStatusResponse, error) 
 		strs := strings.Split(text, "\t")
 		response.Statuses = append(response.Statuses, &MessageStatus{
 			MessageResult: MessageResult{
-				MessageId:  strs[0],
-				StatusCode: StatusCode(strs[1]),
+				Msgid:      strs[0],
+				Statuscode: StatusCode(strs[1]),
 			},
 			StatusTime: strs[2],
 		})
