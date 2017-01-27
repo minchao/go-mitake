@@ -18,6 +18,7 @@ func (c *Client) SendBatch(messages []Message) (*MessageResponse, error) {
 		ini += "[" + strconv.Itoa(i) + "]\n"
 		ini += message.ToINI()
 	}
+	ini = strings.TrimSpace(ini)
 
 	resp, err := c.Post(url.String(), "text/plain", strings.NewReader(ini))
 	if err != nil {
