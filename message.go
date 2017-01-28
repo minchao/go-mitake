@@ -10,6 +10,7 @@ import (
 	"strings"
 )
 
+// StatusCode of Mitake API.
 type StatusCode string
 
 func (c StatusCode) String() string {
@@ -76,6 +77,7 @@ var statusCodeMap = map[StatusCode]string{
 	Status9:    "預約已取消",
 }
 
+// Message represents an SMS object.
 type Message struct {
 	Dstaddr string `json:"dstaddr"` // Destination phone number
 	Smbody  string `json:"smbody"`  // The text of the message you want to send
