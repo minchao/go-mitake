@@ -26,7 +26,7 @@ const (
 	StatusPasswordRequired              = StatusCode("d")
 	StatusUsernameOrPasswordError       = StatusCode("e")
 	StatusAccountExpired                = StatusCode("f")
-	StatusAccountDisabled               = StatusCode("g")
+	StatusAccountDisabled               = StatusCode("h")
 	StatusInvalidConnectionAddress      = StatusCode("k")
 	StatusChangePasswordRequired        = StatusCode("m")
 	StatusPasswordExpired               = StatusCode("n")
