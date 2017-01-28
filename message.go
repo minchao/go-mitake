@@ -83,6 +83,7 @@ type Message struct {
 	Vldtime string `json:"vldtime"` // Optional
 }
 
+// ToINI returns the INI format string from the message fields.
 func (m Message) ToINI() string {
 	var ini string
 	ini += "dstaddr=" + m.Dstaddr + "\n"

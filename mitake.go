@@ -15,7 +15,8 @@ const (
 	DefaultUserAgent = "go-mitake/" + LibraryVersion
 )
 
-// NewClient returns a new Mitake API client.
+// NewClient returns a new Mitake API client. The username and password are required
+// for authentication. If a nil httpClient is provided, http.DefaultClient will be used.
 func NewClient(username, password string, httpClient *http.Client) *Client {
 	if username == "" || password == "" {
 		log.Fatal("username or password cannot be empty")
@@ -72,6 +73,7 @@ func (c *Client) Do(req *http.Request) (*http.Response, error) {
 	return resp, nil
 }
 
+// NewRequest creates an API request. A relative URL can be provided in urlStr.
 func (c *Client) NewRequest(method, urlStr string, body io.Reader) (*http.Request, error) {
 	rel, err := url.Parse(urlStr)
 	if err != nil {
@@ -108,6 +110,7 @@ func (c *Client) Post(url string, bodyType string, body io.Reader) (*http.Respon
 	return c.Do(req)
 }
 
+// buildDefaultQuey returns the default query string with authentication parameters.
 func (c *Client) buildDefaultQuey() url.Values {
 	q := url.Values{}
 	q.Set("username", c.username)
