@@ -9,7 +9,7 @@ go-mitake is a Go client library for accessing the Mitake SMS API (Taiwan mobile
 ## Installation
 
 ```bash
-go get github.com/minchao/go-mitake
+go get -u github.com/minchao/go-mitake
 ```
 
 ## Usage

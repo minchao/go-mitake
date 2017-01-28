@@ -8,6 +8,9 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+
+	"golang.org/x/text/encoding/traditionalchinese"
+	"golang.org/x/text/transform"
 )
 
 // StatusCode of Mitake API.
@@ -108,16 +111,18 @@ type MessageResult struct {
 type MessageResponse struct {
 	Results      []*MessageResult
 	AccountPoint int
+	INI          string `json:"-"`
 }
 
 func parseMessageResponse(body io.Reader) (*MessageResponse, error) {
 	var (
-		scanner  = bufio.NewScanner(body)
+		scanner  = bufio.NewScanner(transform.NewReader(body, traditionalchinese.Big5.NewDecoder()))
 		response = new(MessageResponse)
 		result   *MessageResult
 	)
 	for scanner.Scan() {
 		text := strings.TrimSpace(scanner.Text())
+		response.INI += text + "\n"
 
 		if matched, _ := regexp.MatchString(`^\[\d+]$`, text); matched {
 			result = new(MessageResult)
@@ -147,15 +152,17 @@ type MessageStatus struct {
 
 type MessageStatusResponse struct {
 	Statuses []*MessageStatus
+	INI      string `json:"-"`
 }
 
 func parseMessageStatusResponse(body io.Reader) (*MessageStatusResponse, error) {
 	var (
-		scanner  = bufio.NewScanner(body)
+		scanner  = bufio.NewScanner(transform.NewReader(body, traditionalchinese.Big5.NewDecoder()))
 		response = new(MessageStatusResponse)
 	)
 	for scanner.Scan() {
 		text := strings.TrimSpace(scanner.Text())
+		response.INI += text + "\n"
 
 		strs := strings.Split(text, "\t")
 		response.Statuses = append(response.Statuses, &MessageStatus{
