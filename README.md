@@ -1,5 +1,6 @@
 # go-mitake
 
+[![GoDoc](https://godoc.org/github.com/minchao/go-mitake?status.svg)](https://godoc.org/github.com/minchao/go-mitake)
 [![Build Status](https://travis-ci.org/minchao/go-mitake.svg?branch=master)](https://travis-ci.org/minchao/go-mitake)
 [![Go Report Card](https://goreportcard.com/badge/github.com/minchao/go-mitake)](https://goreportcard.com/report/github.com/minchao/go-mitake)
 
