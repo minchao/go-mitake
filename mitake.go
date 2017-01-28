@@ -96,6 +96,7 @@ func (c *Client) NewRequest(method, urlStr string, body io.Reader) (*http.Reques
 	return req, nil
 }
 
+// Get method make a GET HTTP request.
 func (c *Client) Get(url string) (*http.Response, error) {
 	req, err := c.NewRequest("GET", url, nil)
 	if err != nil {
@@ -104,6 +105,7 @@ func (c *Client) Get(url string) (*http.Response, error) {
 	return c.Do(req)
 }
 
+// Post method make a POST HTTP request.
 func (c *Client) Post(url string, bodyType string, body io.Reader) (*http.Response, error) {
 	req, err := c.NewRequest("POST", url, body)
 	if err != nil {
