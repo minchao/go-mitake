@@ -10,9 +10,9 @@ import (
 )
 
 const (
-	LibraryVersion   = "0.0.1"
-	DefaultBaseURL   = "https://smexpress.mitake.com.tw:9601/"
-	DefaultUserAgent = "go-mitake/" + LibraryVersion
+	libraryVersion   = "0.0.1"
+	defaultBaseURL   = "https://smexpress.mitake.com.tw:9601/"
+	defaultUserAgent = "go-mitake/" + libraryVersion
 )
 
 // NewClient returns a new Mitake API client. The username and password are required
@@ -25,13 +25,13 @@ func NewClient(username, password string, httpClient *http.Client) *Client {
 		httpClient = http.DefaultClient
 	}
 
-	baseURL, _ := url.Parse(DefaultBaseURL)
+	baseURL, _ := url.Parse(defaultBaseURL)
 
 	return &Client{
 		client:    httpClient,
 		username:  username,
 		password:  password,
-		UserAgent: DefaultUserAgent,
+		UserAgent: defaultUserAgent,
 		BaseURL:   baseURL,
 	}
 }

@@ -61,7 +61,7 @@ func testINI(t *testing.T, r *http.Request, want string) {
 func TestNewClient(t *testing.T) {
 	c := NewClient("username", "password", http.DefaultClient)
 
-	if got, want := c.BaseURL.String(), DefaultBaseURL; got != want {
+	if got, want := c.BaseURL.String(), defaultBaseURL; got != want {
 		t.Errorf("NewClient BaseURL is %v, want %v", got, want)
 	}
 }
@@ -69,7 +69,7 @@ func TestNewClient(t *testing.T) {
 func TestClient_NewRequest(t *testing.T) {
 	c := NewClient("username", "password", http.DefaultClient)
 
-	inURL, outURL := "/foo", DefaultBaseURL+"foo"
+	inURL, outURL := "/foo", defaultBaseURL+"foo"
 	inBody, outBody := "Hello, 世界", "Hello, 世界"
 	req, _ := c.NewRequest("GET", inURL, strings.NewReader(inBody))
 
