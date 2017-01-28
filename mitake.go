@@ -11,7 +11,7 @@ import (
 
 const (
 	LibraryVersion   = "0.0.1"
-	DefaultBaseURL   = "https://smexpress.mitake.com.tw:9601"
+	DefaultBaseURL   = "https://smexpress.mitake.com.tw:9601/"
 	DefaultUserAgent = "go-mitake/" + LibraryVersion
 )
 
@@ -73,7 +73,9 @@ func (c *Client) Do(req *http.Request) (*http.Response, error) {
 	return resp, nil
 }
 
-// NewRequest creates an API request. A relative URL can be provided in urlStr.
+// NewRequest creates an API request. A relative URL can be provided in urlStr,
+// in which case it is resolved relative to the BaseURL of the Client.
+// Relative URLs should always be specified without a preceding slash.
 func (c *Client) NewRequest(method, urlStr string, body io.Reader) (*http.Request, error) {
 	rel, err := url.Parse(urlStr)
 	if err != nil {

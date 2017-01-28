@@ -10,7 +10,7 @@ import (
 func (c *Client) SendBatch(messages []Message) (*MessageResponse, error) {
 	q := c.buildDefaultQuey()
 	q.Set("encoding", "UTF8")
-	url, _ := url.Parse("/SmSendPost.asp")
+	url, _ := url.Parse("SmSendPost.asp")
 	url.RawQuery = q.Encode()
 
 	var ini string
@@ -34,7 +34,7 @@ func (c *Client) Send(message Message) (*MessageResponse, error) {
 }
 
 func (c *Client) QueryAccountPoint() (int, error) {
-	url, _ := url.Parse("/SmQueryGet.asp")
+	url, _ := url.Parse("SmQueryGet.asp")
 	url.RawQuery = c.buildDefaultQuey().Encode()
 
 	resp, err := c.Get(url.String())
@@ -54,7 +54,7 @@ func (c *Client) QueryMessageStatus(messageIds []string) (*MessageStatusResponse
 	q := c.buildDefaultQuey()
 	q.Set("msgid", strings.Join(messageIds, ","))
 
-	url, _ := url.Parse("/SmQueryGet.asp")
+	url, _ := url.Parse("SmQueryGet.asp")
 	url.RawQuery = q.Encode()
 
 	resp, err := c.Get(url.String())
