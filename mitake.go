@@ -59,6 +59,7 @@ func checkErrorResponse(r *http.Response) error {
 	}
 }
 
+// Do sends an API request, and returns the API response.
 // If the returned error is nil, the Response will contain a non-nil
 // Body which the user is expected to close.
 func (c *Client) Do(req *http.Request) (*http.Response, error) {

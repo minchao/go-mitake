@@ -169,7 +169,7 @@ func parseMessageStatusResponse(body io.Reader) (*MessageStatusResponse, error) 
 	return response, nil
 }
 
-// Message delivery receipt.
+// MessageReceipt represents a message delivery receipt.
 type MessageReceipt struct {
 	Msgid      string     `json:"msgid"`
 	Dstaddr    string     `json:"dstaddr"`
@@ -180,7 +180,7 @@ type MessageReceipt struct {
 	StatusFlag string     `json:"StatusFlag"`
 }
 
-// Parse an incoming Mitake callback request and return the MessageReceipt.
+// ParseMessageReceipt parse an incoming Mitake callback request and return the MessageReceipt.
 //
 // Example usage:
 //

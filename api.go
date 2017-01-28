@@ -7,6 +7,7 @@ import (
 	"strings"
 )
 
+// SendBatch sends multiple SMS.
 func (c *Client) SendBatch(messages []Message) (*MessageResponse, error) {
 	q := c.buildDefaultQuey()
 	q.Set("encoding", "UTF8")
@@ -29,10 +30,12 @@ func (c *Client) SendBatch(messages []Message) (*MessageResponse, error) {
 	return parseMessageResponse(resp.Body)
 }
 
+// Send an SMS.
 func (c *Client) Send(message Message) (*MessageResponse, error) {
 	return c.SendBatch([]Message{message})
 }
 
+// QueryAccountPoint retrieves your account balance.
 func (c *Client) QueryAccountPoint() (int, error) {
 	url, _ := url.Parse("SmQueryGet.asp")
 	url.RawQuery = c.buildDefaultQuey().Encode()
@@ -50,6 +53,7 @@ func (c *Client) QueryAccountPoint() (int, error) {
 	return strconv.Atoi(strings.Split(string(data), "=")[1])
 }
 
+// QueryMessageStatus fetch the status of specific messages.
 func (c *Client) QueryMessageStatus(messageIds []string) (*MessageStatusResponse, error) {
 	q := c.buildDefaultQuey()
 	q.Set("msgid", strings.Join(messageIds, ","))
