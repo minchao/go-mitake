@@ -48,15 +48,15 @@ type Client struct {
 
 // checkErrorResponse checks the API response for errors.
 func checkErrorResponse(r *http.Response) error {
-	if c := r.StatusCode; 200 <= c && c <= 299 {
+	c := r.StatusCode
+	if 200 <= c && c <= 299 {
 		if r.ContentLength == 0 {
 			return errors.New("unexpected empty body")
 		}
 		return nil
-	} else {
-		// Mitake API always return status code 200
-		return fmt.Errorf("unexpected status code: %d", c)
 	}
+	// Mitake API always return status code 200
+	return fmt.Errorf("unexpected status code: %d", c)
 }
 
 // Do sends an API request, and returns the API response.
