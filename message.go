@@ -40,9 +40,9 @@ const (
 	StatusSMSBodyEmpty                  = StatusCode("u")
 	StatusInvalidPhoneNumber            = StatusCode("v")
 	StatusReservationForDelivery        = StatusCode("0")
-	StatusSMSContentError               = StatusCode("1")
-	StatusSMSPhoneNumberError           = StatusCode("2")
-	StatusCarrierAccepted               = StatusCode("3")
+	StatusCarrierAccepted               = StatusCode("1")
+	StatusCarrierAccepted2              = StatusCode("2")
+	StatusCarrierAccepted3              = StatusCode("3")
 	StatusDelivered                     = StatusCode("4")
 	StatusContentError                  = StatusCode("5")
 	StatusPhoneNumberError              = StatusCode("6")
@@ -70,9 +70,9 @@ var statusCodeMap = map[StatusCode]string{
 	StatusSMSBodyEmpty:                  "簡訊內容不得為空白",
 	StatusInvalidPhoneNumber:            "無效的手機號碼",
 	StatusReservationForDelivery:        "預約傳送中",
-	StatusSMSContentError:               "已送達業者",
-	StatusSMSPhoneNumberError:           "已送達業者",
 	StatusCarrierAccepted:               "已送達業者",
+	StatusCarrierAccepted2:              "已送達業者",
+	StatusCarrierAccepted3:              "已送達業者",
 	StatusDelivered:                     "已送達手機",
 	StatusContentError:                  "內容有錯誤",
 	StatusPhoneNumberError:              "門號有錯誤",
