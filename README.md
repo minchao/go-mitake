@@ -55,7 +55,7 @@ response, err := client.SendBatch(messages)
 Query the status of messages:
 
 ```go
-response, err := err := client.QueryMessageStatus([]string{"MESSAGE_ID1", "MESSAGE_ID2"})
+response, err := client.QueryMessageStatus([]string{"MESSAGE_ID1", "MESSAGE_ID2"})
 ```
 
 ## License
