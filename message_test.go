@@ -66,7 +66,7 @@ func Test_parseMessageStatusResponse(t *testing.T) {
 1010079523	4	20170101010011`)
 	resp, err := parseMessageStatusResponse(body)
 	if err != nil {
-		t.Errorf("parseMessageStatusResponse retrned unexpected error: %v", err)
+		t.Errorf("parseMessageStatusResponse returned unexpected error: %v", err)
 	}
 	if len(resp.Statuses) != 2 {
 		t.Errorf("MessageStatusResponse.Statuses len is %d, want %d", len(resp.Statuses), 2)
