@@ -83,10 +83,11 @@ var statusCodeMap = map[StatusCode]string{
 
 // Message represents an SMS object.
 type Message struct {
-	Dstaddr string `json:"dstaddr"` // Destination phone number
-	Smbody  string `json:"smbody"`  // The text of the message you want to send
-	Dlvtime string `json:"dlvtime"` // Optional, Delivery time
-	Vldtime string `json:"vldtime"` // Optional
+	Dstaddr  string `json:"dstaddr"`  // Destination phone number
+	Smbody   string `json:"smbody"`   // The text of the message you want to send
+	Dlvtime  string `json:"dlvtime"`  // Optional, Delivery time
+	Vldtime  string `json:"vldtime"`  // Optional
+	Response string `json:"response"` // Optional, Callback URL to receive the delivery receipt of the message
 }
 
 // ToINI returns the INI format string from the message fields.
@@ -99,6 +100,9 @@ func (m Message) ToINI() string {
 	}
 	if m.Vldtime != "" {
 		ini += "vldtime=" + m.Vldtime + "\n"
+	}
+	if m.Response != "" {
+		ini += "response=" + m.Response + "\n"
 	}
 	return ini
 }

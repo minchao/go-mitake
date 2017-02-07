@@ -58,6 +58,22 @@ Query the status of messages:
 response, err := client.QueryMessageStatus([]string{"MESSAGE_ID1", "MESSAGE_ID2"})
 ```
 
+Use webhook to receive the delivery receipts of the messages:
+
+```go
+http.HandleFunc("/callback", func(w http.ResponseWriter, r *http.Request) {
+    receipt, err := mitake.ParseMessageReceipt(r)
+    if err != nil {
+        // Handle error...
+        return
+    }
+    // Process message receipt...
+})
+if err := http.ListenAndServe(":80", nil); err != nil {
+    log.Printf("ListenAndServe error: %v", err)
+}
+```
+
 ## License
 
 See the [LICENSE](LICENSE.md) file for license rights and limitations (MIT).
