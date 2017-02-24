@@ -101,7 +101,7 @@ func TestClient_Do(t *testing.T) {
 	req, _ := client.NewRequest("GET", "/", nil)
 	resp, err := client.Do(req)
 	if err != nil {
-
+		t.Errorf("Do returned unexpected error: %v", err)
 	}
 	defer resp.Body.Close()
 
