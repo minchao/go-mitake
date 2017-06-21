@@ -48,12 +48,14 @@ AccountPoint=98`)
 
 	want := []*MessageResult{
 		{
-			Msgid:      "1010079522",
-			Statuscode: StatusCode("1"),
+			Msgid:        "1010079522",
+			Statuscode:   "1",
+			Statusstring: StatusCode("1"),
 		},
 		{
-			Msgid:      "1010079523",
-			Statuscode: StatusCode("4"),
+			Msgid:        "1010079523",
+			Statuscode:   "4",
+			Statusstring: StatusCode("4"),
 		},
 	}
 	if !reflect.DeepEqual(resp.Results, want) {
@@ -75,15 +77,17 @@ func Test_parseMessageStatusResponse(t *testing.T) {
 	want := []*MessageStatus{
 		{
 			MessageResult: MessageResult{
-				Msgid:      "1010079522",
-				Statuscode: StatusCode("1"),
+				Msgid:        "1010079522",
+				Statuscode:   "1",
+				Statusstring: StatusCode("1"),
 			},
 			StatusTime: "20170101010010",
 		},
 		{
 			MessageResult: MessageResult{
-				Msgid:      "1010079523",
-				Statuscode: StatusCode("4"),
+				Msgid:        "1010079523",
+				Statuscode:   "4",
+				Statusstring: StatusCode("4"),
 			},
 			StatusTime: "20170101010011",
 		},

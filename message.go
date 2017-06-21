@@ -108,8 +108,9 @@ func (m Message) ToINI() string {
 }
 
 type MessageResult struct {
-	Msgid      string     `json:"msgid"`
-	Statuscode StatusCode `json:"statuscode"`
+	Msgid        string     `json:"msgid"`
+	Statuscode   string     `json:"statuscode"`
+	Statusstring StatusCode `json:"statusstring"`
 }
 
 type MessageResponse struct {
@@ -137,7 +138,8 @@ func parseMessageResponse(body io.Reader) (*MessageResponse, error) {
 			case "msgid":
 				result.Msgid = strs[1]
 			case "statuscode":
-				result.Statuscode = StatusCode(strs[1])
+				result.Statusstring = StatusCode(strs[1])
+				result.Statuscode = strs[1]
 			case "AccountPoint":
 				response.AccountPoint, _ = strconv.Atoi(strs[1])
 			}
@@ -171,8 +173,9 @@ func parseMessageStatusResponse(body io.Reader) (*MessageStatusResponse, error) 
 		strs := strings.Split(text, "\t")
 		response.Statuses = append(response.Statuses, &MessageStatus{
 			MessageResult: MessageResult{
-				Msgid:      strs[0],
-				Statuscode: StatusCode(strs[1]),
+				Msgid:        strs[0],
+				Statusstring: StatusCode(strs[1]),
+				Statuscode:   strs[1],
 			},
 			StatusTime: strs[2],
 		})
@@ -185,13 +188,14 @@ func parseMessageStatusResponse(body io.Reader) (*MessageStatusResponse, error) 
 
 // MessageReceipt represents a message delivery receipt.
 type MessageReceipt struct {
-	Msgid      string     `json:"msgid"`
-	Dstaddr    string     `json:"dstaddr"`
-	Dlvtime    string     `json:"dlvtime"`
-	Donetime   string     `json:"donetime"`
-	Statuscode StatusCode `json:"statuscode"`
-	Statusstr  string     `json:"statusstr"`
-	StatusFlag string     `json:"StatusFlag"`
+	Msgid        string     `json:"msgid"`
+	Dstaddr      string     `json:"dstaddr"`
+	Dlvtime      string     `json:"dlvtime"`
+	Donetime     string     `json:"donetime"`
+	Statuscode   string     `json:"statuscode"`
+	Statusstring StatusCode `json:"statusstring"`
+	Statusstr    string     `json:"statusstr"`
+	StatusFlag   string     `json:"StatusFlag"`
 }
 
 // ParseMessageReceipt parse an incoming Mitake callback request and return the MessageReceipt.
@@ -210,12 +214,13 @@ func ParseMessageReceipt(r *http.Request) (*MessageReceipt, error) {
 		return nil, errors.New("receipt not found")
 	}
 	return &MessageReceipt{
-		Msgid:      values.Get("msgid"),
-		Dstaddr:    values.Get("dstaddr"),
-		Dlvtime:    values.Get("dlvtime"),
-		Donetime:   values.Get("donetime"),
-		Statuscode: StatusCode(values.Get("statuscode")),
-		Statusstr:  values.Get("statusstr"),
-		StatusFlag: values.Get("StatusFlag"),
+		Msgid:        values.Get("msgid"),
+		Dstaddr:      values.Get("dstaddr"),
+		Dlvtime:      values.Get("dlvtime"),
+		Donetime:     values.Get("donetime"),
+		Statuscode:   values.Get("statuscode"),
+		Statusstring: StatusCode(values.Get("statuscode")),
+		Statusstr:    values.Get("statusstr"),
+		StatusFlag:   values.Get("StatusFlag"),
 	}, nil
 }
