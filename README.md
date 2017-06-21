@@ -69,6 +69,7 @@ http.HandleFunc("/callback", func(w http.ResponseWriter, r *http.Request) {
     }
     // Process message receipt...
 })
+// The callback URL port number must be standard 80 (HTTP) or 443 (HTTPS).
 if err := http.ListenAndServe(":80", nil); err != nil {
     log.Printf("ListenAndServe error: %v", err)
 }
