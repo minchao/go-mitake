@@ -116,3 +116,39 @@ func TestClient_QueryMessageStatus(t *testing.T) {
 		t.Errorf("QueryMessageStatus returned %+v, want %+v", resp.Statuses, want)
 	}
 }
+
+func TestClient_CancelMessage(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/SmCancel.asp", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "GET")
+		fmt.Fprint(w, `1010079522=8
+1010079523=9`)
+	})
+
+	resp, err := client.CancelMessageStatus([]string{"1010079522", "1010079523"})
+	if err != nil {
+		t.Errorf("QueryMessageStatus returned unexpected error: %v", err)
+	}
+
+	want := []*MessageStatus{
+		{
+			MessageResult: MessageResult{
+				Msgid:        "1010079522",
+				Statuscode:   "8",
+				Statusstring: StatusCode("8"),
+			},
+		},
+		{
+			MessageResult: MessageResult{
+				Msgid:        "1010079523",
+				Statuscode:   "9",
+				Statusstring: StatusCode("9"),
+			},
+		},
+	}
+	if !reflect.DeepEqual(resp.Statuses, want) {
+		t.Errorf("QueryMessageStatus returned %+v, want %+v", resp.Statuses, want)
+	}
+}

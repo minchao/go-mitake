@@ -96,3 +96,35 @@ func Test_parseMessageStatusResponse(t *testing.T) {
 		t.Errorf("MessageStatus returned %+v, want %+v", resp.Statuses, want)
 	}
 }
+
+func Test_parseMessageCancelStatusResponse(t *testing.T) {
+	body := strings.NewReader(`1010079522=8
+1010079523=9`)
+	resp, err := parseCancelMessageStatusResponse(body)
+	if err != nil {
+		t.Errorf("parseMessageStatusResponse returned unexpected error: %v", err)
+	}
+	if len(resp.Statuses) != 2 {
+		t.Errorf("MessageStatusResponse.Statuses len is %d, want %d", len(resp.Statuses), 2)
+	}
+
+	want := []*MessageStatus{
+		{
+			MessageResult: MessageResult{
+				Msgid:        "1010079522",
+				Statuscode:   "8",
+				Statusstring: StatusCode("8"),
+			},
+		},
+		{
+			MessageResult: MessageResult{
+				Msgid:        "1010079523",
+				Statuscode:   "9",
+				Statusstring: StatusCode("9"),
+			},
+		},
+	}
+	if !reflect.DeepEqual(resp.Statuses, want) {
+		t.Errorf("MessageStatus returned %+v, want %+v", resp.Statuses, want)
+	}
+}
