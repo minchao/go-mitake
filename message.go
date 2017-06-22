@@ -186,6 +186,30 @@ func parseMessageStatusResponse(body io.Reader) (*MessageStatusResponse, error) 
 	return response, nil
 }
 
+func parseCancelMessageStatusResponse(body io.Reader) (*MessageStatusResponse, error) {
+	var (
+		scanner  = bufio.NewScanner(transform.NewReader(body, traditionalchinese.Big5.NewDecoder()))
+		response = new(MessageStatusResponse)
+	)
+	for scanner.Scan() {
+		text := strings.TrimSpace(scanner.Text())
+		response.INI += text + "\n"
+
+		strs := strings.Split(text, "=")
+		response.Statuses = append(response.Statuses, &MessageStatus{
+			MessageResult: MessageResult{
+				Msgid:        strs[0],
+				Statusstring: StatusCode(strs[1]),
+				Statuscode:   strs[1],
+			},
+		})
+	}
+	if err := scanner.Err(); err != nil {
+		return nil, err
+	}
+	return response, nil
+}
+
 // MessageReceipt represents a message delivery receipt.
 type MessageReceipt struct {
 	Msgid        string     `json:"msgid"`
