@@ -9,13 +9,8 @@ import (
 )
 
 func usage() {
-	fmt.Println(`Usage: send [options]
-Options are:
-    -u  Mitake Username
-    -p  Mitake Password
-    -t  Destination phone number, for example: 0987654321
-    -m  Message content`)
-	os.Exit(0)
+	fmt.Fprintln(os.Stderr, `Usage: send [options]`)
+	flag.PrintDefaults()
 }
 
 func main() {
@@ -28,14 +23,15 @@ func main() {
 
 	flag.StringVar(&username, "u", os.Getenv("MITAKE_USERNAME"), "Username")
 	flag.StringVar(&password, "p", os.Getenv("MITAKE_PASSWORD"), "Password")
-	flag.StringVar(&to, "t", "", "Destination phone number")
+	flag.StringVar(&to, "t", "", "Destination phone number, for example: 0987654321")
 	flag.StringVar(&message, "m", "", "Message content")
 
 	flag.Usage = usage
 	flag.Parse()
 
-	if len(os.Args) < 2 {
-		usage()
+	if len(os.Args) < 3 {
+		flag.Usage()
+		os.Exit(1)
 	}
 
 	client := mitake.NewClient(username, password, nil)
