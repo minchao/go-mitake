@@ -69,3 +69,20 @@ func (c *Client) QueryMessageStatus(messageIds []string) (*MessageStatusResponse
 
 	return parseMessageStatusResponse(resp.Body)
 }
+
+// CancelMessageStatus cancel the specific messages.
+func (c *Client) CancelMessageStatus(messageIds []string) (*MessageStatusResponse, error) {
+	q := c.buildDefaultQuey()
+	q.Set("msgid", strings.Join(messageIds, ","))
+
+	url, _ := url.Parse("SmCancel.asp")
+	url.RawQuery = q.Encode()
+
+	resp, err := c.Get(url.String())
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	return parseCancelMessageStatusResponse(resp.Body)
+}
