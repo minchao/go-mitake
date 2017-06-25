@@ -1,6 +1,7 @@
 package mitake
 
 import (
+	"net/http"
 	"reflect"
 	"strings"
 	"testing"
@@ -128,4 +129,42 @@ func Test_parseMessageCancelStatusResponse(t *testing.T) {
 	if !reflect.DeepEqual(resp.Statuses, want) {
 		t.Errorf("MessageStatus returned %+v, want %+v", resp.Statuses, want)
 	}
+}
+
+func Test_ParseMessageReceipt(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/callback", func(w http.ResponseWriter, r *http.Request) {
+		receipt, err := ParseMessageReceipt(r)
+		if err != nil {
+			t.Errorf("ParseMessageReceipt returned unexpected error: %v", err)
+			return
+		}
+
+		want := &MessageReceipt{
+			Msgid:        "8091234567",
+			Dstaddr:      "09001234567",
+			Dlvtime:      "20060810125612",
+			Donetime:     "20060810165612",
+			Statuscode:   "0",
+			Statusstring: StatusCode("0"),
+			Statusstr:    "DELIVRD",
+			StatusFlag:   "4",
+		}
+
+		if !reflect.DeepEqual(receipt, want) {
+			t.Errorf("Message received: %v, want %v", receipt, want)
+		}
+	})
+
+	// Simulate the mitake server response.
+	client.Get("/callback" +
+		"?msgid=8091234567" +
+		"&dstaddr=09001234567" +
+		"&dlvtime=20060810125612" +
+		"&donetime=20060810165612" +
+		"&statusstr=DELIVRD" +
+		"&statuscode=0" +
+		"&StatusFlag=4")
 }
