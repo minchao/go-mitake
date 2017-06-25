@@ -29,10 +29,8 @@ func setup() {
 
 	// mitake client configured to use test server
 	baseURL, _ := url.Parse(server.URL)
-	client = &Client{
-		client:  http.DefaultClient,
-		BaseURL: baseURL,
-	}
+	client = NewClient("username", "password", nil)
+	client.BaseURL = baseURL
 }
 
 // teardown closes the test HTTP server.
@@ -59,7 +57,7 @@ func testINI(t *testing.T, r *http.Request, want string) {
 }
 
 func TestNewClient(t *testing.T) {
-	c := NewClient("username", "password", http.DefaultClient)
+	c := NewClient("username", "password", nil)
 
 	if got, want := c.BaseURL.String(), defaultBaseURL; got != want {
 		t.Errorf("NewClient BaseURL is %v, want %v", got, want)
@@ -67,7 +65,7 @@ func TestNewClient(t *testing.T) {
 }
 
 func TestClient_NewRequest(t *testing.T) {
-	c := NewClient("username", "password", http.DefaultClient)
+	c := NewClient("username", "password", nil)
 
 	inURL, outURL := "/foo", defaultBaseURL+"foo"
 	inBody, outBody := "Hello, 世界", "Hello, 世界"
