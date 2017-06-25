@@ -61,6 +61,43 @@ AccountPoint=98`)
 	}
 }
 
+func TestClient_Send(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/SmSendPost.asp", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "POST")
+		testINI(t, r, `[0]
+dstaddr=0987654321
+smbody=Test 1`)
+		fmt.Fprint(w, `[0]
+msgid=1010079522
+statuscode=1
+AccountPoint=99`)
+	})
+
+	resp, err := client.Send(
+		Message{
+			Dstaddr: "0987654321",
+			Smbody:  "Test 1",
+		},
+	)
+	if err != nil {
+		t.Errorf("Send returned unexpected error: %v", err)
+	}
+
+	want := []*MessageResult{
+		{
+			Msgid:        "1010079522",
+			Statuscode:   "1",
+			Statusstring: StatusCode("1"),
+		},
+	}
+	if !reflect.DeepEqual(resp.Results, want) {
+		t.Errorf("Send returned %+v, want %+v", resp.Results, want)
+	}
+}
+
 func TestClient_QueryAccountPoint(t *testing.T) {
 	setup()
 	defer teardown()
