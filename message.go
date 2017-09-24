@@ -92,9 +92,11 @@ type Message struct {
 
 // ToINI returns the INI format string from the message fields.
 func (m Message) ToINI() string {
+	smbody := strings.Replace(m.Smbody, "\n", string(byte(6)), -1)
+
 	var ini string
 	ini += "dstaddr=" + m.Dstaddr + "\n"
-	ini += "smbody=" + m.Smbody + "\n"
+	ini += "smbody=" + smbody + "\n"
 	if m.Dlvtime != "" {
 		ini += "dlvtime=" + m.Dlvtime + "\n"
 	}
