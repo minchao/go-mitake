@@ -115,8 +115,8 @@ func (c *Client) Post(url string, bodyType string, body io.Reader) (*http.Respon
 	return c.Do(req)
 }
 
-// buildDefaultQuey returns the default query string with authentication parameters.
-func (c *Client) buildDefaultQuey() url.Values {
+// buildDefaultQuery returns the default query string with authentication parameters.
+func (c *Client) buildDefaultQuery() url.Values {
 	q := url.Values{}
 	q.Set("username", c.username)
 	q.Set("password", c.password)

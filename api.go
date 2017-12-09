@@ -9,7 +9,7 @@ import (
 
 // SendBatch sends multiple SMS.
 func (c *Client) SendBatch(messages []Message) (*MessageResponse, error) {
-	q := c.buildDefaultQuey()
+	q := c.buildDefaultQuery()
 	q.Set("encoding", "UTF8")
 	url, _ := url.Parse("SmSendPost.asp")
 	url.RawQuery = q.Encode()
@@ -38,7 +38,7 @@ func (c *Client) Send(message Message) (*MessageResponse, error) {
 // QueryAccountPoint retrieves your account balance.
 func (c *Client) QueryAccountPoint() (int, error) {
 	url, _ := url.Parse("SmQueryGet.asp")
-	url.RawQuery = c.buildDefaultQuey().Encode()
+	url.RawQuery = c.buildDefaultQuery().Encode()
 
 	resp, err := c.Get(url.String())
 	if err != nil {
@@ -55,7 +55,7 @@ func (c *Client) QueryAccountPoint() (int, error) {
 
 // QueryMessageStatus fetch the status of specific messages.
 func (c *Client) QueryMessageStatus(messageIds []string) (*MessageStatusResponse, error) {
-	q := c.buildDefaultQuey()
+	q := c.buildDefaultQuery()
 	q.Set("msgid", strings.Join(messageIds, ","))
 
 	url, _ := url.Parse("SmQueryGet.asp")
@@ -72,7 +72,7 @@ func (c *Client) QueryMessageStatus(messageIds []string) (*MessageStatusResponse
 
 // CancelMessageStatus cancel the specific messages.
 func (c *Client) CancelMessageStatus(messageIds []string) (*MessageStatusResponse, error) {
-	q := c.buildDefaultQuey()
+	q := c.buildDefaultQuery()
 	q.Set("msgid", strings.Join(messageIds, ","))
 
 	url, _ := url.Parse("SmCancel.asp")
