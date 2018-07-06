@@ -83,7 +83,9 @@ var statusCodeMap = map[StatusCode]string{
 
 // Message represents an SMS object.
 type Message struct {
+	ID       string `json:"id"`       // Defaul ID of the message
 	Dstaddr  string `json:"dstaddr"`  // Destination phone number
+	Destname string `json:"destname"` // Destination receiver name
 	Smbody   string `json:"smbody"`   // The text of the message you want to send
 	Dlvtime  string `json:"dlvtime"`  // Optional, Delivery time
 	Vldtime  string `json:"vldtime"`  // Optional
