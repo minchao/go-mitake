@@ -111,6 +111,30 @@ func (m Message) ToINI() string {
 	return ini
 }
 
+// ToLM returns the format string for Long SMS.
+func (m Message) ToLM() string {
+	var ini string
+	ini += m.Dstaddr + "$$"
+	if m.Dlvtime != "" {
+		ini += m.Dlvtime
+	}
+	ini += "$$"
+	if m.Vldtime != "" {
+		ini += m.Vldtime
+	}
+	ini += "$$"
+	if m.Destname != "" {
+		ini += m.Destname
+	}
+	ini += "$$"
+	if m.Response != "" {
+		ini += m.Response
+	}
+	ini += "$$"
+	ini += m.Smbody + "\n"
+	return ini
+}
+
 type MessageResult struct {
 	Msgid        string     `json:"msgid"`
 	Statuscode   string     `json:"statuscode"`
@@ -134,6 +158,38 @@ func parseMessageResponse(body io.Reader) (*MessageResponse, error) {
 		response.INI += text + "\n"
 
 		if matched, _ := regexp.MatchString(`^\[\d+]$`, text); matched {
+			result = new(MessageResult)
+			response.Results = append(response.Results, result)
+		} else {
+			strs := strings.Split(text, "=")
+			switch strs[0] {
+			case "msgid":
+				result.Msgid = strs[1]
+			case "statuscode":
+				result.Statusstring = StatusCode(strs[1])
+				result.Statuscode = strs[1]
+			case "AccountPoint":
+				response.AccountPoint, _ = strconv.Atoi(strs[1])
+			}
+		}
+	}
+	if err := scanner.Err(); err != nil {
+		return nil, err
+	}
+	return response, nil
+}
+
+func parseLongMessageResponse(body io.Reader) (*MessageResponse, error) {
+	var (
+		scanner  = bufio.NewScanner(transform.NewReader(body, traditionalchinese.Big5.NewDecoder()))
+		response = new(MessageResponse)
+		result   *MessageResult
+	)
+	for scanner.Scan() {
+		text := strings.TrimSpace(scanner.Text())
+		response.INI += text + "\n"
+
+		if matched, _ := regexp.MatchString(`^\[[a-zA-z0-9]+\]$`, text); matched {
 			result = new(MessageResult)
 			response.Results = append(response.Results, result)
 		} else {
