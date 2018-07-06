@@ -11,9 +11,20 @@ import (
 
 const (
 	libraryVersion   = "0.0.1"
-	defaultBaseURL   = "https://smexpress.mitake.com.tw:9601/"
 	defaultUserAgent = "go-mitake/" + libraryVersion
+	apiTypeDefault   = 1
+
+	// APITypeMultiShortMessagePost is the const representing mitake multi short sms api
+	APITypeMultiShortMessagePost = 1
+
+	// APITypeMultiLongMessagePost is the const representing mitake multi long sms api
+	APITypeMultiLongMessagePost = 2
 )
+
+var apiURLMap = map[int]string{
+	APITypeMultiShortMessagePost: "https://smexpress.mitake.com.tw:9601/",
+	APITypeMultiLongMessagePost:  "https://smexpress.mitake.com.tw:7102/",
+}
 
 // NewClient returns a new Mitake API client. The username and password are required
 // for authentication. If a nil httpClient is provided, http.DefaultClient will be used.
@@ -25,7 +36,7 @@ func NewClient(username, password string, httpClient *http.Client) *Client {
 		httpClient = http.DefaultClient
 	}
 
-	baseURL, _ := url.Parse(defaultBaseURL)
+	baseURL, _ := url.Parse(apiURLMap[apiTypeDefault])
 
 	return &Client{
 		client:    httpClient,
@@ -57,6 +68,13 @@ func checkErrorResponse(r *http.Response) error {
 	}
 	// Mitake API always return status code 200
 	return fmt.Errorf("unexpected status code: %d", c)
+}
+
+// SetAPIType allows user to set API type after creating new client
+func (c *Client) SetAPIType(apiType int) {
+	baseURL, _ := url.Parse(apiURLMap[apiType])
+	c.BaseURL = baseURL
+	return
 }
 
 // Do sends an API request, and returns the API response.
