@@ -61,6 +61,64 @@ AccountPoint=98`)
 	}
 }
 
+func TestClient_SendBatchLong(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/SpLmPost", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "POST")
+		testINI(t, r, `0aab$$0987654321$$20170101010000$$20170101012300$$Bob$$https://example.com/callback$$Test1
+1aab$$0987654321$$$$$$Bob$$$$Test2`)
+		fmt.Fprint(w, `[0aab]
+msgid=#1010079522
+statuscode=1
+[1aab]
+msgid=#1010079523
+statuscode=4
+AccountPoint=98`)
+	})
+
+	messages := []Message{
+		{
+			ID:       "0aab",
+			Destname: "Bob",
+			Dlvtime:  "20170101010000",
+			Vldtime:  "20170101012300",
+			Dstaddr:  "0987654321",
+			Smbody:   "Test1",
+			Response: "https://example.com/callback",
+		},
+		{
+			ID:       "1aab",
+			Destname: "Bob",
+			Dstaddr:  "0987654321",
+			Smbody:   "Test2",
+		},
+	}
+
+	resp, err := client.SendBatchLong(messages)
+
+	if err != nil {
+		t.Errorf("SendBatchLong returned unexpected error: %v", err)
+	}
+
+	want := []*MessageResult{
+		{
+			Msgid:        "#1010079522",
+			Statuscode:   "1",
+			Statusstring: StatusCode("1"),
+		},
+		{
+			Msgid:        "#1010079523",
+			Statuscode:   "4",
+			Statusstring: StatusCode("4"),
+		},
+	}
+	if !reflect.DeepEqual(resp.Results, want) {
+		t.Errorf("SendBatchLong returned %+v, want %+v", resp.Results, want)
+	}
+}
+
 func TestClient_Send(t *testing.T) {
 	setup()
 	defer teardown()
@@ -95,6 +153,44 @@ AccountPoint=99`)
 	}
 	if !reflect.DeepEqual(resp.Results, want) {
 		t.Errorf("Send returned %+v, want %+v", resp.Results, want)
+	}
+}
+
+func TestClient_SendLM(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/SpLmPost", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "POST")
+		testINI(t, r, `0aab$$0987654321$$$$$$John$$https://example.com/callback$$Test1`)
+		fmt.Fprint(w, `[0aab]
+msgid=#1010079522
+statuscode=1
+AccountPoint=99`)
+	})
+
+	resp, err := client.SendLM(
+		Message{
+			ID:       "0aab",
+			Destname: "John",
+			Dstaddr:  "0987654321",
+			Smbody:   "Test1",
+			Response: "https://example.com/callback",
+		},
+	)
+	if err != nil {
+		t.Errorf("SendLM returned unexpected error: %v", err)
+	}
+
+	want := []*MessageResult{
+		{
+			Msgid:        "#1010079522",
+			Statuscode:   "1",
+			Statusstring: StatusCode("1"),
+		},
+	}
+	if !reflect.DeepEqual(resp.Results, want) {
+		t.Errorf("SendLM returned %+v, want %+v", resp.Results, want)
 	}
 }
 
