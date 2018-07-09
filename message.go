@@ -83,7 +83,9 @@ var statusCodeMap = map[StatusCode]string{
 
 // Message represents an SMS object.
 type Message struct {
+	ID       string `json:"id"`       // Default ID of the message
 	Dstaddr  string `json:"dstaddr"`  // Destination phone number
+	Destname string `json:"destname"` // Destination receiver name
 	Smbody   string `json:"smbody"`   // The text of the message you want to send
 	Dlvtime  string `json:"dlvtime"`  // Optional, Delivery time
 	Vldtime  string `json:"vldtime"`  // Optional
@@ -106,6 +108,30 @@ func (m Message) ToINI() string {
 	if m.Response != "" {
 		ini += "response=" + m.Response + "\n"
 	}
+	return ini
+}
+
+// ToLongMessage returns the format string for Long SMS.
+func (m Message) ToLongMessage() string {
+	var ini string
+	ini += m.Dstaddr + "$$"
+	if m.Dlvtime != "" {
+		ini += m.Dlvtime
+	}
+	ini += "$$"
+	if m.Vldtime != "" {
+		ini += m.Vldtime
+	}
+	ini += "$$"
+	if m.Destname != "" {
+		ini += m.Destname
+	}
+	ini += "$$"
+	if m.Response != "" {
+		ini += m.Response
+	}
+	ini += "$$"
+	ini += m.Smbody + "\n"
 	return ini
 }
 
@@ -132,6 +158,38 @@ func parseMessageResponse(body io.Reader) (*MessageResponse, error) {
 		response.INI += text + "\n"
 
 		if matched, _ := regexp.MatchString(`^\[\d+]$`, text); matched {
+			result = new(MessageResult)
+			response.Results = append(response.Results, result)
+		} else {
+			strs := strings.Split(text, "=")
+			switch strs[0] {
+			case "msgid":
+				result.Msgid = strs[1]
+			case "statuscode":
+				result.Statusstring = StatusCode(strs[1])
+				result.Statuscode = strs[1]
+			case "AccountPoint":
+				response.AccountPoint, _ = strconv.Atoi(strs[1])
+			}
+		}
+	}
+	if err := scanner.Err(); err != nil {
+		return nil, err
+	}
+	return response, nil
+}
+
+func parseLongMessageResponse(body io.Reader) (*MessageResponse, error) {
+	var (
+		scanner  = bufio.NewScanner(transform.NewReader(body, traditionalchinese.Big5.NewDecoder()))
+		response = new(MessageResponse)
+		result   *MessageResult
+	)
+	for scanner.Scan() {
+		text := strings.TrimSpace(scanner.Text())
+		response.INI += text + "\n"
+
+		if matched, _ := regexp.MatchString(`^\[[a-zA-z0-9]+\]$`, text); matched {
 			result = new(MessageResult)
 			response.Results = append(response.Results, result)
 		} else {

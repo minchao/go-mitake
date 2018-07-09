@@ -31,6 +31,7 @@ func setup() {
 	baseURL, _ := url.Parse(server.URL)
 	client = NewClient("username", "password", nil)
 	client.BaseURL = baseURL
+	client.LongMessageBaseURL = baseURL
 }
 
 // teardown closes the test HTTP server.

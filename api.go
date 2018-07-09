@@ -30,9 +30,39 @@ func (c *Client) SendBatch(messages []Message) (*MessageResponse, error) {
 	return parseMessageResponse(resp.Body)
 }
 
+// SendLongMessageBatch sends multiple long message SMS
+func (c *Client) SendLongMessageBatch(messages []Message) (*MessageResponse, error) {
+	q := c.buildDefaultQuery()
+	q.Set("Encoding_PostIn", "UTF8")
+
+	url := *c.LongMessageBaseURL
+	url.Path = "SpLmPost"
+	url.RawQuery = q.Encode()
+
+	var ini string
+	for _, message := range messages {
+		ini += message.ID + "$$"
+		ini += message.ToLongMessage()
+	}
+	ini = strings.TrimSpace(ini)
+
+	resp, err := c.Post(url.String(), "text/plain", strings.NewReader(ini))
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	return parseLongMessageResponse(resp.Body)
+}
+
 // Send an SMS.
 func (c *Client) Send(message Message) (*MessageResponse, error) {
 	return c.SendBatch([]Message{message})
+}
+
+// SendLongMessage sends a long SMS.
+func (c *Client) SendLongMessage(message Message) (*MessageResponse, error) {
+	return c.SendLongMessageBatch([]Message{message})
 }
 
 // QueryAccountPoint retrieves your account balance.
