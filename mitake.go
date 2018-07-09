@@ -92,7 +92,14 @@ func (c *Client) Do(req *http.Request) (*http.Response, error) {
 // in which case it is resolved relative to the BaseURL of the Client.
 // Relative URLs should always be specified without a preceding slash.
 func (c *Client) NewRequest(method, urlStr string, body io.Reader) (*http.Request, error) {
-	req, err := http.NewRequest(method, urlStr, body)
+	rel, err := url.Parse(urlStr)
+	if err != nil {
+		return nil, err
+	}
+
+	u := c.BaseURL.ResolveReference(rel)
+
+	req, err := http.NewRequest(method, u.String(), body)
 	if err != nil {
 		return nil, err
 	}
