@@ -60,7 +60,7 @@ func (c *Client) Send(message Message) (*MessageResponse, error) {
 	return c.SendBatch([]Message{message})
 }
 
-// SendLM an Long SMS.
+// SendLongMessage sends a long SMS.
 func (c *Client) SendLongMessage(message Message) (*MessageResponse, error) {
 	return c.SendLongMessageBatch([]Message{message})
 }
