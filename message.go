@@ -111,8 +111,8 @@ func (m Message) ToINI() string {
 	return ini
 }
 
-// ToLM returns the format string for Long SMS.
-func (m Message) ToLM() string {
+// ToLongMessage returns the format string for Long SMS.
+func (m Message) ToLongMessage() string {
 	var ini string
 	ini += m.Dstaddr + "$$"
 	if m.Dlvtime != "" {

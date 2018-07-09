@@ -30,19 +30,19 @@ func (c *Client) SendBatch(messages []Message) (*MessageResponse, error) {
 	return parseMessageResponse(resp.Body)
 }
 
-// SendBatchLong sends long SMS.
+// SendLongMessageBatch sends multiple long message SMS
 func (c *Client) SendLongMessageBatch(messages []Message) (*MessageResponse, error) {
 	q := c.buildDefaultQuery()
 	q.Set("Encoding_PostIn", "UTF8")
 
-	url := *c.LongMessageURL
+	url := *c.LongMessageBaseURL
 	url.Path = "SpLmPost"
 	url.RawQuery = q.Encode()
 
 	var ini string
 	for _, message := range messages {
 		ini += message.ID + "$$"
-		ini += message.ToLM()
+		ini += message.ToLongMessage()
 	}
 	ini = strings.TrimSpace(ini)
 

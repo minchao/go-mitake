@@ -10,21 +10,11 @@ import (
 )
 
 const (
-	libraryVersion   = "0.0.1"
-	defaultUserAgent = "go-mitake/" + libraryVersion
-	apiTypeDefault   = 1
-
-	// APITypeMultiShortMessagePost is the const representing mitake multi short sms api
-	APITypeMultiShortMessagePost = 1
-
-	// APITypeMultiLongMessagePost is the const representing mitake multi long sms api
-	APITypeMultiLongMessagePost = 2
+	libraryVersion            = "0.0.1"
+	defaultUserAgent          = "go-mitake/" + libraryVersion
+	defaultBaseURL            = "https://smexpress.mitake.com.tw:9601/"
+	defaultLongMessageBaseURL = "https://smexpress.mitake.com.tw:7102/"
 )
-
-var apiURLMap = map[int]string{
-	APITypeMultiShortMessagePost: "https://smexpress.mitake.com.tw:9601/",
-	APITypeMultiLongMessagePost:  "https://smexpress.mitake.com.tw:7102/",
-}
 
 // NewClient returns a new Mitake API client. The username and password are required
 // for authentication. If a nil httpClient is provided, http.DefaultClient will be used.
@@ -36,16 +26,16 @@ func NewClient(username, password string, httpClient *http.Client) *Client {
 		httpClient = http.DefaultClient
 	}
 
-	baseURL, _ := url.Parse(apiURLMap[apiTypeDefault])
-	longMessageURL, _ := url.Parse(apiURLMap[APITypeMultiLongMessagePost])
+	baseURL, _ := url.Parse(defaultBaseURL)
+	longMessageBaseURL, _ := url.Parse(defaultLongMessageBaseURL)
 
 	return &Client{
-		client:         httpClient,
-		username:       username,
-		password:       password,
-		UserAgent:      defaultUserAgent,
-		BaseURL:        baseURL,
-		LongMessageURL: longMessageURL,
+		client:             httpClient,
+		username:           username,
+		password:           password,
+		UserAgent:          defaultUserAgent,
+		BaseURL:            baseURL,
+		LongMessageBaseURL: longMessageBaseURL,
 	}
 }
 
@@ -55,9 +45,9 @@ type Client struct {
 	username string
 	password string
 
-	BaseURL        *url.URL
-	LongMessageURL *url.URL
-	UserAgent      string
+	BaseURL            *url.URL
+	LongMessageBaseURL *url.URL
+	UserAgent          string
 }
 
 // checkErrorResponse checks the API response for errors.

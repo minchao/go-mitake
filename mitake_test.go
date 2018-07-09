@@ -31,7 +31,7 @@ func setup() {
 	baseURL, _ := url.Parse(server.URL)
 	client = NewClient("username", "password", nil)
 	client.BaseURL = baseURL
-	client.LongMessageURL = baseURL
+	client.LongMessageBaseURL = baseURL
 }
 
 // teardown closes the test HTTP server.
@@ -60,7 +60,7 @@ func testINI(t *testing.T, r *http.Request, want string) {
 func TestNewClient(t *testing.T) {
 	c := NewClient("username", "password", nil)
 
-	if got, want := c.BaseURL.String(), apiURLMap[apiTypeDefault]; got != want {
+	if got, want := c.BaseURL.String(), defaultBaseURL; got != want {
 		t.Errorf("NewClient BaseURL is %v, want %v", got, want)
 	}
 }
@@ -68,7 +68,7 @@ func TestNewClient(t *testing.T) {
 func TestClient_NewRequest(t *testing.T) {
 	c := NewClient("username", "password", nil)
 
-	inURL, outURL := "/foo", apiURLMap[apiTypeDefault]+"foo"
+	inURL, outURL := "/foo", defaultBaseURL+"foo"
 	inBody, outBody := "Hello, 世界", "Hello, 世界"
 	req, _ := c.NewRequest("GET", inURL, strings.NewReader(inBody))
 

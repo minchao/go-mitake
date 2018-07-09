@@ -29,7 +29,7 @@ func TestMessage_ToINI(t *testing.T) {
 	}
 }
 
-func TestMessage_ToLM(t *testing.T) {
+func TestMessage_ToLongMessage(t *testing.T) {
 	message1 := Message{
 		Dstaddr:  "0987654321",
 		Destname: "Bob",
@@ -39,7 +39,7 @@ func TestMessage_ToLM(t *testing.T) {
 		Response: "https://example.com/callback",
 	}
 	want1 := "0987654321$$20170101010000$$20170101012300$$Bob$$https://example.com/callback$$Test\n"
-	if got := message1.ToLM(); got != want1 {
+	if got := message1.ToLongMessage(); got != want1 {
 		t.Errorf("Message LM is %v, want %v", got, want1)
 	}
 	message2 := Message{
@@ -47,7 +47,7 @@ func TestMessage_ToLM(t *testing.T) {
 		Smbody:  "Test",
 	}
 	want2 := "0987654321$$$$$$$$$$Test\n"
-	if got := message2.ToLM(); got != want2 {
+	if got := message2.ToLongMessage(); got != want2 {
 		t.Errorf("Message LM is %v, want %v", got, want1)
 	}
 }
