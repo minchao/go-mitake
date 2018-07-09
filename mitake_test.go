@@ -31,6 +31,7 @@ func setup() {
 	baseURL, _ := url.Parse(server.URL)
 	client = NewClient("username", "password", nil)
 	client.BaseURL = baseURL
+	client.LongMessageURL = baseURL
 }
 
 // teardown closes the test HTTP server.
@@ -67,7 +68,7 @@ func TestNewClient(t *testing.T) {
 func TestClient_NewRequest(t *testing.T) {
 	c := NewClient("username", "password", nil)
 
-	inURL, outURL := "/foo", apiURLMap[apiTypeDefault]+"foo"
+	inURL, outURL := c.BaseURL.String()+"foo", c.BaseURL.String()+"foo"
 	inBody, outBody := "Hello, 世界", "Hello, 世界"
 	req, _ := c.NewRequest("GET", inURL, strings.NewReader(inBody))
 
@@ -96,7 +97,7 @@ func TestClient_Do(t *testing.T) {
 		fmt.Fprint(w, "Hello, 世界")
 	})
 
-	req, _ := client.NewRequest("GET", "/", nil)
+	req, _ := client.NewRequest("GET", client.BaseURL.String()+"/", nil)
 	resp, err := client.Do(req)
 	if err != nil {
 		t.Errorf("Do returned unexpected error: %v", err)
@@ -119,7 +120,7 @@ func TestClient_Do_httpError(t *testing.T) {
 		http.Error(w, "Bad Request", 400)
 	})
 
-	req, _ := client.NewRequest("GET", "/", nil)
+	req, _ := client.NewRequest("GET", client.BaseURL.String()+"/", nil)
 	_, err := client.Do(req)
 
 	if err == nil {

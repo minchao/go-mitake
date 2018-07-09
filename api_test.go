@@ -61,7 +61,7 @@ AccountPoint=98`)
 	}
 }
 
-func TestClient_SendBatchLong(t *testing.T) {
+func TestClient_SendLongMessageBatch(t *testing.T) {
 	setup()
 	defer teardown()
 
@@ -96,10 +96,10 @@ AccountPoint=98`)
 		},
 	}
 
-	resp, err := client.SendBatchLong(messages)
+	resp, err := client.SendLongMessageBatch(messages)
 
 	if err != nil {
-		t.Errorf("SendBatchLong returned unexpected error: %v", err)
+		t.Errorf("SendLongMessageBatch returned unexpected error: %v", err)
 	}
 
 	want := []*MessageResult{
@@ -115,7 +115,7 @@ AccountPoint=98`)
 		},
 	}
 	if !reflect.DeepEqual(resp.Results, want) {
-		t.Errorf("SendBatchLong returned %+v, want %+v", resp.Results, want)
+		t.Errorf("SendLongMessageBatch returned %+v, want %+v", resp.Results, want)
 	}
 }
 
@@ -156,7 +156,7 @@ AccountPoint=99`)
 	}
 }
 
-func TestClient_SendLM(t *testing.T) {
+func TestClient_SendLongMessage(t *testing.T) {
 	setup()
 	defer teardown()
 
@@ -169,7 +169,7 @@ statuscode=1
 AccountPoint=99`)
 	})
 
-	resp, err := client.SendLM(
+	resp, err := client.SendLongMessage(
 		Message{
 			ID:       "0aab",
 			Destname: "John",
@@ -179,7 +179,7 @@ AccountPoint=99`)
 		},
 	)
 	if err != nil {
-		t.Errorf("SendLM returned unexpected error: %v", err)
+		t.Errorf("SendLongMessage returned unexpected error: %v", err)
 	}
 
 	want := []*MessageResult{
@@ -190,7 +190,7 @@ AccountPoint=99`)
 		},
 	}
 	if !reflect.DeepEqual(resp.Results, want) {
-		t.Errorf("SendLM returned %+v, want %+v", resp.Results, want)
+		t.Errorf("SendLongMessage returned %+v, want %+v", resp.Results, want)
 	}
 }
 

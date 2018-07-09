@@ -37,13 +37,15 @@ func NewClient(username, password string, httpClient *http.Client) *Client {
 	}
 
 	baseURL, _ := url.Parse(apiURLMap[apiTypeDefault])
+	longMessageURL, _ := url.Parse(apiURLMap[APITypeMultiLongMessagePost])
 
 	return &Client{
-		client:    httpClient,
-		username:  username,
-		password:  password,
-		UserAgent: defaultUserAgent,
-		BaseURL:   baseURL,
+		client:         httpClient,
+		username:       username,
+		password:       password,
+		UserAgent:      defaultUserAgent,
+		BaseURL:        baseURL,
+		LongMessageURL: longMessageURL,
 	}
 }
 
@@ -53,8 +55,9 @@ type Client struct {
 	username string
 	password string
 
-	BaseURL   *url.URL
-	UserAgent string
+	BaseURL        *url.URL
+	LongMessageURL *url.URL
+	UserAgent      string
 }
 
 // checkErrorResponse checks the API response for errors.
@@ -68,13 +71,6 @@ func checkErrorResponse(r *http.Response) error {
 	}
 	// Mitake API always return status code 200
 	return fmt.Errorf("unexpected status code: %d", c)
-}
-
-// SetAPIType allows user to set API type after creating new client
-func (c *Client) SetAPIType(apiType int) {
-	baseURL, _ := url.Parse(apiURLMap[apiType])
-	c.BaseURL = baseURL
-	return
 }
 
 // Do sends an API request, and returns the API response.
@@ -96,14 +92,7 @@ func (c *Client) Do(req *http.Request) (*http.Response, error) {
 // in which case it is resolved relative to the BaseURL of the Client.
 // Relative URLs should always be specified without a preceding slash.
 func (c *Client) NewRequest(method, urlStr string, body io.Reader) (*http.Request, error) {
-	rel, err := url.Parse(urlStr)
-	if err != nil {
-		return nil, err
-	}
-
-	u := c.BaseURL.ResolveReference(rel)
-
-	req, err := http.NewRequest(method, u.String(), body)
+	req, err := http.NewRequest(method, urlStr, body)
 	if err != nil {
 		return nil, err
 	}

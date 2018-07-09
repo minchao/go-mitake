@@ -11,7 +11,12 @@ import (
 func (c *Client) SendBatch(messages []Message) (*MessageResponse, error) {
 	q := c.buildDefaultQuery()
 	q.Set("encoding", "UTF8")
-	url, _ := url.Parse("SmSendPost.asp")
+
+	rel, err := url.Parse("SmSendPost.asp")
+	if err != nil {
+		return nil, err
+	}
+	url := c.BaseURL.ResolveReference(rel)
 	url.RawQuery = q.Encode()
 
 	var ini string
@@ -31,10 +36,15 @@ func (c *Client) SendBatch(messages []Message) (*MessageResponse, error) {
 }
 
 // SendBatchLong sends long SMS.
-func (c *Client) SendBatchLong(messages []Message) (*MessageResponse, error) {
+func (c *Client) SendLongMessageBatch(messages []Message) (*MessageResponse, error) {
 	q := c.buildDefaultQuery()
 	q.Set("Encoding_PostIn", "UTF8")
-	url, _ := url.Parse("SpLmPost")
+
+	rel, err := url.Parse("SpLmPost")
+	if err != nil {
+		return nil, err
+	}
+	url := c.LongMessageURL.ResolveReference(rel)
 	url.RawQuery = q.Encode()
 
 	var ini string
@@ -59,13 +69,17 @@ func (c *Client) Send(message Message) (*MessageResponse, error) {
 }
 
 // SendLM an Long SMS.
-func (c *Client) SendLM(message Message) (*MessageResponse, error) {
-	return c.SendBatchLong([]Message{message})
+func (c *Client) SendLongMessage(message Message) (*MessageResponse, error) {
+	return c.SendLongMessageBatch([]Message{message})
 }
 
 // QueryAccountPoint retrieves your account balance.
 func (c *Client) QueryAccountPoint() (int, error) {
-	url, _ := url.Parse("SmQueryGet.asp")
+	rel, err := url.Parse("SmQueryGet.asp")
+	if err != nil {
+		return 0, err
+	}
+	url := c.BaseURL.ResolveReference(rel)
 	url.RawQuery = c.buildDefaultQuery().Encode()
 
 	resp, err := c.Get(url.String())
@@ -86,7 +100,11 @@ func (c *Client) QueryMessageStatus(messageIds []string) (*MessageStatusResponse
 	q := c.buildDefaultQuery()
 	q.Set("msgid", strings.Join(messageIds, ","))
 
-	url, _ := url.Parse("SmQueryGet.asp")
+	rel, err := url.Parse("SmQueryGet.asp")
+	if err != nil {
+		return nil, err
+	}
+	url := c.BaseURL.ResolveReference(rel)
 	url.RawQuery = q.Encode()
 
 	resp, err := c.Get(url.String())
@@ -103,7 +121,11 @@ func (c *Client) CancelMessageStatus(messageIds []string) (*MessageStatusRespons
 	q := c.buildDefaultQuery()
 	q.Set("msgid", strings.Join(messageIds, ","))
 
-	url, _ := url.Parse("SmCancel.asp")
+	rel, err := url.Parse("SmCancel.asp")
+	if err != nil {
+		return nil, err
+	}
+	url := c.BaseURL.ResolveReference(rel)
 	url.RawQuery = q.Encode()
 
 	resp, err := c.Get(url.String())
