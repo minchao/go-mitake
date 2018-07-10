@@ -20,7 +20,7 @@ func (c StatusCode) String() string {
 	return statusCodeMap[c]
 }
 
-// List of Mitake API status codes
+// List of Mitake API status codes.
 const (
 	StatusServiceError                  = StatusCode("*")
 	StatusSMSTemporarilyUnavailable     = StatusCode("a")

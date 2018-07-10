@@ -30,7 +30,7 @@ func (c *Client) SendBatch(messages []Message) (*MessageResponse, error) {
 	return parseMessageResponse(resp.Body)
 }
 
-// SendLongMessageBatch sends multiple long message SMS
+// SendLongMessageBatch sends multiple long message SMS.
 func (c *Client) SendLongMessageBatch(messages []Message) (*MessageResponse, error) {
 	q := c.buildDefaultQuery()
 	q.Set("Encoding_PostIn", "UTF8")
