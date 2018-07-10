@@ -149,7 +149,7 @@ type MessageResponse struct {
 	INI          string `json:"-"`
 }
 
-func parseMessageResponse(body io.Reader) (*MessageResponse, error) {
+func parseMessageResponseByPattern(pattern string, body io.Reader) (*MessageResponse, error) {
 	var (
 		scanner  = bufio.NewScanner(transform.NewReader(body, traditionalchinese.Big5.NewDecoder()))
 		response = new(MessageResponse)
@@ -159,7 +159,7 @@ func parseMessageResponse(body io.Reader) (*MessageResponse, error) {
 		text := strings.TrimSpace(scanner.Text())
 		response.INI += text + "\n"
 
-		if matched, _ := regexp.MatchString(`^\[\d+]$`, text); matched {
+		if matched, _ := regexp.MatchString(pattern, text); matched {
 			result = new(MessageResult)
 			response.Results = append(response.Results, result)
 		} else {
@@ -181,36 +181,12 @@ func parseMessageResponse(body io.Reader) (*MessageResponse, error) {
 	return response, nil
 }
 
-func parseLongMessageResponse(body io.Reader) (*MessageResponse, error) {
-	var (
-		scanner  = bufio.NewScanner(transform.NewReader(body, traditionalchinese.Big5.NewDecoder()))
-		response = new(MessageResponse)
-		result   *MessageResult
-	)
-	for scanner.Scan() {
-		text := strings.TrimSpace(scanner.Text())
-		response.INI += text + "\n"
+func parseMessageResponse(body io.Reader) (*MessageResponse, error) {
+	return parseMessageResponseByPattern(`^\[\d+\]$`, body)
+}
 
-		if matched, _ := regexp.MatchString(`^\[[a-zA-z0-9]+\]$`, text); matched {
-			result = new(MessageResult)
-			response.Results = append(response.Results, result)
-		} else {
-			strs := strings.Split(text, "=")
-			switch strs[0] {
-			case "msgid":
-				result.Msgid = strs[1]
-			case "statuscode":
-				result.Statusstring = StatusCode(strs[1])
-				result.Statuscode = strs[1]
-			case "AccountPoint":
-				response.AccountPoint, _ = strconv.Atoi(strs[1])
-			}
-		}
-	}
-	if err := scanner.Err(); err != nil {
-		return nil, err
-	}
-	return response, nil
+func parseLongMessageResponse(body io.Reader) (*MessageResponse, error) {
+	return parseMessageResponseByPattern(`^\[[a-zA-z0-9]+\]$`, body)
 }
 
 // MessageStatus represents status of message.
