@@ -11,8 +11,8 @@ import (
 func (c *Client) SendBatch(messages []Message) (*MessageResponse, error) {
 	q := c.buildDefaultQuery()
 	q.Set("encoding", "UTF8")
-	url, _ := url.Parse("SmSendPost.asp")
-	url.RawQuery = q.Encode()
+	u, _ := url.Parse("SmSendPost.asp")
+	u.RawQuery = q.Encode()
 
 	var ini string
 	for i, message := range messages {
@@ -21,7 +21,7 @@ func (c *Client) SendBatch(messages []Message) (*MessageResponse, error) {
 	}
 	ini = strings.TrimSpace(ini)
 
-	resp, err := c.Post(url.String(), "text/plain", strings.NewReader(ini))
+	resp, err := c.Post(u.String(), "text/plain", strings.NewReader(ini))
 	if err != nil {
 		return nil, err
 	}
@@ -35,9 +35,9 @@ func (c *Client) SendLongMessageBatch(messages []Message) (*MessageResponse, err
 	q := c.buildDefaultQuery()
 	q.Set("Encoding_PostIn", "UTF8")
 
-	url := *c.LongMessageBaseURL
-	url.Path = "SpLmPost"
-	url.RawQuery = q.Encode()
+	u := *c.LongMessageBaseURL
+	u.Path = "SpLmPost"
+	u.RawQuery = q.Encode()
 
 	var ini string
 	for _, message := range messages {
@@ -46,7 +46,7 @@ func (c *Client) SendLongMessageBatch(messages []Message) (*MessageResponse, err
 	}
 	ini = strings.TrimSpace(ini)
 
-	resp, err := c.Post(url.String(), "text/plain", strings.NewReader(ini))
+	resp, err := c.Post(u.String(), "text/plain", strings.NewReader(ini))
 	if err != nil {
 		return nil, err
 	}
@@ -67,10 +67,10 @@ func (c *Client) SendLongMessage(message Message) (*MessageResponse, error) {
 
 // QueryAccountPoint retrieves your account balance.
 func (c *Client) QueryAccountPoint() (int, error) {
-	url, _ := url.Parse("SmQueryGet.asp")
-	url.RawQuery = c.buildDefaultQuery().Encode()
+	u, _ := url.Parse("SmQueryGet.asp")
+	u.RawQuery = c.buildDefaultQuery().Encode()
 
-	resp, err := c.Get(url.String())
+	resp, err := c.Get(u.String())
 	if err != nil {
 		return 0, err
 	}
@@ -88,10 +88,10 @@ func (c *Client) QueryMessageStatus(messageIds []string) (*MessageStatusResponse
 	q := c.buildDefaultQuery()
 	q.Set("msgid", strings.Join(messageIds, ","))
 
-	url, _ := url.Parse("SmQueryGet.asp")
-	url.RawQuery = q.Encode()
+	u, _ := url.Parse("SmQueryGet.asp")
+	u.RawQuery = q.Encode()
 
-	resp, err := c.Get(url.String())
+	resp, err := c.Get(u.String())
 	if err != nil {
 		return nil, err
 	}
@@ -105,10 +105,10 @@ func (c *Client) CancelMessageStatus(messageIds []string) (*MessageStatusRespons
 	q := c.buildDefaultQuery()
 	q.Set("msgid", strings.Join(messageIds, ","))
 
-	url, _ := url.Parse("SmCancel.asp")
-	url.RawQuery = q.Encode()
+	u, _ := url.Parse("SmCancel.asp")
+	u.RawQuery = q.Encode()
 
-	resp, err := c.Get(url.String())
+	resp, err := c.Get(u.String())
 	if err != nil {
 		return nil, err
 	}
