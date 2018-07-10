@@ -135,12 +135,14 @@ func (m Message) ToLongMessage() string {
 	return ini
 }
 
+// MessageResult represents result of send SMS.
 type MessageResult struct {
 	Msgid        string     `json:"msgid"`
 	Statuscode   string     `json:"statuscode"`
 	Statusstring StatusCode `json:"statusstring"`
 }
 
+// MessageResponse represents response of send SMS.
 type MessageResponse struct {
 	Results      []*MessageResult
 	AccountPoint int
@@ -211,11 +213,13 @@ func parseLongMessageResponse(body io.Reader) (*MessageResponse, error) {
 	return response, nil
 }
 
+// MessageStatus represents status of message.
 type MessageStatus struct {
 	MessageResult
 	StatusTime string `json:"statustime"`
 }
 
+// MessageStatusResponse represents response of query message status.
 type MessageStatusResponse struct {
 	Statuses []*MessageStatus
 	INI      string `json:"-"`
