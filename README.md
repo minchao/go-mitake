@@ -33,7 +33,7 @@ Send an SMS:
 ```go
 message := mitake.Message{
     Dstaddr: "0987654321",
-    Smbody:  "Test SMS",
+    Smbody:  "Message ...",
 }
 
 response, err := client.Send(message)
@@ -45,12 +45,23 @@ Send multiple SMS:
 messages := []mitake.Message{
     {
         Dstaddr: "0987654321",
-        Smbody:  "Test SMS",
+        Smbody:  "Message ...",
     },
     // ...
 }
 
 response, err := client.SendBatch(messages)
+```
+
+Send an long SMS:
+
+```go
+message := mitake.Message{
+    Dstaddr: "0987654321",
+    Smbody:  "Long message ...",
+}
+
+response, err := client.SendLongMessage(message)
 ```
 
 Query the status of messages:
