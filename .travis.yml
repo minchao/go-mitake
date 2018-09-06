@@ -9,10 +9,12 @@ go:
   - 1.11.x
   - master
 
+install:
+  - make deps
+
 script:
-  - diff -u <(echo -n) <(gofmt -d -s .)
-  - go tool vet .
-  - go test -v -race -coverprofile=coverage.txt -covermode=atomic
+  - make lint
+  - make test
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
