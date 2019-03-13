@@ -218,7 +218,7 @@ func Test_ParseMessageReceipt(t *testing.T) {
 	})
 
 	// Simulate the mitake server response.
-	client.Get("/callback" +
+	_, _ = client.Get("/callback" +
 		"?msgid=8091234567" +
 		"&dstaddr=09001234567" +
 		"&dlvtime=20060810125612" +

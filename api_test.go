@@ -19,7 +19,7 @@ smbody=Test 1
 [1]
 dstaddr=0987654322
 smbody=Test 2`)
-		fmt.Fprint(w, `[0]
+		_, _ = fmt.Fprint(w, `[0]
 msgid=1010079522
 statuscode=1
 [1]
@@ -69,7 +69,7 @@ func TestClient_SendLongMessageBatch(t *testing.T) {
 		testMethod(t, r, "POST")
 		testINI(t, r, `0aab$$0987654321$$20170101010000$$20170101012300$$Bob$$https://example.com/callback$$Test1
 1aab$$0987654321$$$$$$Bob$$$$Test2`)
-		fmt.Fprint(w, `[0aab]
+		_, _ = fmt.Fprint(w, `[0aab]
 msgid=#1010079522
 statuscode=1
 [1aab]
@@ -128,7 +128,7 @@ func TestClient_Send(t *testing.T) {
 		testINI(t, r, `[0]
 dstaddr=0987654321
 smbody=Test 1`)
-		fmt.Fprint(w, `[0]
+		_, _ = fmt.Fprint(w, `[0]
 msgid=1010079522
 statuscode=1
 AccountPoint=99`)
@@ -163,7 +163,7 @@ func TestClient_SendLongMessage(t *testing.T) {
 	mux.HandleFunc("/SpLmPost", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "POST")
 		testINI(t, r, `0aab$$0987654321$$$$$$John$$https://example.com/callback$$Test1`)
-		fmt.Fprint(w, `[0aab]
+		_, _ = fmt.Fprint(w, `[0aab]
 msgid=#1010079522
 statuscode=1
 AccountPoint=99`)
@@ -200,7 +200,7 @@ func TestClient_QueryAccountPoint(t *testing.T) {
 
 	mux.HandleFunc("/SmQueryGet.asp", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
-		fmt.Fprint(w, `AccountPoint=100`)
+		_, _ = fmt.Fprint(w, `AccountPoint=100`)
 	})
 
 	ap, err := client.QueryAccountPoint()
@@ -218,7 +218,7 @@ func TestClient_QueryMessageStatus(t *testing.T) {
 
 	mux.HandleFunc("/SmQueryGet.asp", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
-		fmt.Fprint(w, `1010079522	1	20170101010010
+		_, _ = fmt.Fprint(w, `1010079522	1	20170101010010
 1010079523	4	20170101010011`)
 	})
 
@@ -256,7 +256,7 @@ func TestClient_CancelMessage(t *testing.T) {
 
 	mux.HandleFunc("/SmCancel.asp", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
-		fmt.Fprint(w, `1010079522=8
+		_, _ = fmt.Fprint(w, `1010079522=8
 1010079523=9`)
 	})
 

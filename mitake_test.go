@@ -84,7 +84,7 @@ func TestClient_Do(t *testing.T) {
 		if m := "GET"; m != r.Method {
 			t.Errorf("Request method is %v, want %v", r.Method, m)
 		}
-		fmt.Fprint(w, "Hello, 世界")
+		_, _ = fmt.Fprint(w, "Hello, 世界")
 	})
 
 	req, _ := client.NewRequest("GET", "/", nil)
@@ -123,7 +123,7 @@ func TestClient_Do_noContent(t *testing.T) {
 	defer teardown()
 
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprint(w, "")
+		_, _ = fmt.Fprint(w, "")
 	})
 
 	req, _ := client.NewRequest("GET", "/", nil)

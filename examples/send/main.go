@@ -9,7 +9,7 @@ import (
 )
 
 func usage() {
-	fmt.Fprintln(os.Stderr, `Usage: send [options]`)
+	_, _ = fmt.Fprintln(os.Stderr, `Usage: send [options]`)
 	flag.PrintDefaults()
 }
 
@@ -41,9 +41,9 @@ func main() {
 		Smbody:  message,
 	})
 	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
+		_, _ = fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 
-	fmt.Fprintf(os.Stdout, "result: %+v\n", resp.INI)
+	_, _ = fmt.Fprintf(os.Stdout, "result: %+v\n", resp.INI)
 }
