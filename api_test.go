@@ -8,7 +8,7 @@ import (
 )
 
 func TestClient_SendBatch(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	mux.HandleFunc("/SmSendPost.asp", func(w http.ResponseWriter, r *http.Request) {
@@ -62,7 +62,7 @@ AccountPoint=98`)
 }
 
 func TestClient_SendLongMessageBatch(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	mux.HandleFunc("/SpLmPost", func(w http.ResponseWriter, r *http.Request) {
@@ -120,7 +120,7 @@ AccountPoint=98`)
 }
 
 func TestClient_Send(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	mux.HandleFunc("/SmSendPost.asp", func(w http.ResponseWriter, r *http.Request) {
@@ -157,7 +157,7 @@ AccountPoint=99`)
 }
 
 func TestClient_SendLongMessage(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	mux.HandleFunc("/SpLmPost", func(w http.ResponseWriter, r *http.Request) {
@@ -195,7 +195,7 @@ AccountPoint=99`)
 }
 
 func TestClient_QueryAccountPoint(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	mux.HandleFunc("/SmQueryGet.asp", func(w http.ResponseWriter, r *http.Request) {
@@ -213,7 +213,7 @@ func TestClient_QueryAccountPoint(t *testing.T) {
 }
 
 func TestClient_QueryMessageStatus(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	mux.HandleFunc("/SmQueryGet.asp", func(w http.ResponseWriter, r *http.Request) {
@@ -251,7 +251,7 @@ func TestClient_QueryMessageStatus(t *testing.T) {
 }
 
 func TestClient_CancelMessage(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	mux.HandleFunc("/SmCancel.asp", func(w http.ResponseWriter, r *http.Request) {

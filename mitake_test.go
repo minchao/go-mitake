@@ -11,32 +11,22 @@ import (
 	"testing"
 )
 
-var (
+func setup() (client *Client, mux *http.ServeMux, teardown func()) {
 	// mux is the HTTP request multiplexer used with the test server.
-	mux *http.ServeMux
-
-	// client is the eztalk client being tested.
-	client *Client
+	mux = http.NewServeMux()
 
 	// server is a test HTTP server used to provide mock API responses.
-	server *httptest.Server
-)
-
-func setup() {
-	// test server
-	mux = http.NewServeMux()
-	server = httptest.NewServer(mux)
+	server := httptest.NewServer(mux)
 
 	// mitake client configured to use test server
 	baseURL, _ := url.Parse(server.URL)
+
+	// client is the mitake client being tested.
 	client = NewClient("username", "password", nil)
 	client.BaseURL = baseURL
 	client.LongMessageBaseURL = baseURL
-}
 
-// teardown closes the test HTTP server.
-func teardown() {
-	server.Close()
+	return client, mux, server.Close
 }
 
 func testMethod(t *testing.T, r *http.Request, want string) {
@@ -87,7 +77,7 @@ func TestClient_NewRequest(t *testing.T) {
 }
 
 func TestClient_Do(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
@@ -113,7 +103,7 @@ func TestClient_Do(t *testing.T) {
 }
 
 func TestClient_Do_httpError(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
@@ -129,7 +119,7 @@ func TestClient_Do_httpError(t *testing.T) {
 }
 
 func TestClient_Do_noContent(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {

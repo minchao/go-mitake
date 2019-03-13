@@ -191,7 +191,7 @@ func Test_parseMessageCancelStatusResponse(t *testing.T) {
 }
 
 func Test_ParseMessageReceipt(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	mux.HandleFunc("/callback", func(w http.ResponseWriter, r *http.Request) {
