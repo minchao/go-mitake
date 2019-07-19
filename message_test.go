@@ -14,8 +14,9 @@ func TestMessage_ToINI(t *testing.T) {
 		Dlvtime:  "20170101010000",
 		Vldtime:  "20170101012300",
 		Response: "https://example.com/callback",
+		ClientID: "R123lB29988uDydrjbABCD",
 	}
-	want1 := "dstaddr=0987654321\nsmbody=Test\ndlvtime=20170101010000\nvldtime=20170101012300\nresponse=https://example.com/callback\n"
+	want1 := "dstaddr=0987654321\nsmbody=Test\ndlvtime=20170101010000\nvldtime=20170101012300\nresponse=https://example.com/callback\nClientID=R123lB29988uDydrjbABCD\n"
 	if got := message1.ToINI(); got != want1 {
 		t.Errorf("Message INI is %v, want %v", got, want1)
 	}
