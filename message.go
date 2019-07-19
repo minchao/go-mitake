@@ -90,6 +90,7 @@ type Message struct {
 	Dlvtime  string `json:"dlvtime"`  // Optional, Delivery time
 	Vldtime  string `json:"vldtime"`  // Optional
 	Response string `json:"response"` // Optional, Callback URL to receive the delivery receipt of the message
+	ClientID string `json:"clientid"` // Optional, an unique identifier from client to identify SMS message
 }
 
 // ToINI returns the INI format string from the message fields.
@@ -107,6 +108,9 @@ func (m Message) ToINI() string {
 	}
 	if m.Response != "" {
 		ini += "response=" + m.Response + "\n"
+	}
+	if m.ClientID != "" {
+		ini += "ClientID=" + m.ClientID + "\n"
 	}
 	return ini
 }
