@@ -1,12 +1,17 @@
-.PHONY: all deps test lint
+SHELL := /bin/bash -o pipefail
 
-all: deps lint test
+.PHONY: check-linter
+check-linter:
+	@which golangci-lint >/dev/null || (echo "ERROR: golangci-lint not found" && false)
 
-deps:
-	go get -t -v ./...
+.PHONY: lint
+lint: check-linter
+	golangci-lint run ./...
 
+.PHONY: test
 test:
 	go test -v -race -coverprofile=coverage.txt -covermode=atomic
 
-lint:
-	golangci-lint run ./...
+.PHONY: cover
+cover:
+	go tool cover -html=coverage.txt

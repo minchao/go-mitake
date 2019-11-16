@@ -1,4 +1,6 @@
 language: go
+os: linux
+dist: bionic
 
 go:
   - 1.11.x
@@ -6,9 +8,17 @@ go:
   - 1.13.x
   - master
 
+jobs:
+  allow_failures:
+    - go: master
+
+env:
+  global:
+    - GO111MODULE=on
+
 install:
   - curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | sh -s -- -b $(go env GOPATH)/bin latest
-  - make deps
+  - go mod download
 
 script:
   - make lint
@@ -16,3 +26,7 @@ script:
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
+
+notifications:
+  email:
+    on_success: never
