@@ -31,6 +31,7 @@ const (
 	StatusAccountExpired                = StatusCode("f")
 	StatusAccountDisabled               = StatusCode("h")
 	StatusInvalidConnectionAddress      = StatusCode("k")
+	StatusReachConnectUserLimit         = StatusCode("l")
 	StatusChangePasswordRequired        = StatusCode("m")
 	StatusPasswordExpired               = StatusCode("n")
 	StatusPermissionDenied              = StatusCode("p")
@@ -39,6 +40,10 @@ const (
 	StatusSMSExpired                    = StatusCode("t")
 	StatusSMSBodyEmpty                  = StatusCode("u")
 	StatusInvalidPhoneNumber            = StatusCode("v")
+	StatusQueryRecordExceededLimit      = StatusCode("w")
+	StatusSMSSizeTooLarge               = StatusCode("x")
+	StatusParameterError                = StatusCode("y")
+	StatusNoRecord                      = StatusCode("z")
 	StatusReservationForDelivery        = StatusCode("0")
 	StatusCarrierAccepted               = StatusCode("1")
 	StatusCarrierAccepted2              = StatusCode("2")
@@ -61,6 +66,7 @@ var statusCodeMap = map[StatusCode]string{
 	StatusAccountExpired:                "帳號已過期",
 	StatusAccountDisabled:               "帳號已被停用",
 	StatusInvalidConnectionAddress:      "無效的連線位址",
+	StatusReachConnectUserLimit:         "帳號已達到同時連線數上限",
 	StatusChangePasswordRequired:        "必須變更密碼，在變更密碼前，無法使用簡訊發送服務",
 	StatusPasswordExpired:               "密碼已逾期，在變更密碼前，將無法使用簡訊發送服務",
 	StatusPermissionDenied:              "沒有權限使用外部Http程式",
@@ -69,6 +75,10 @@ var statusCodeMap = map[StatusCode]string{
 	StatusSMSExpired:                    "簡訊已過期",
 	StatusSMSBodyEmpty:                  "簡訊內容不得為空白",
 	StatusInvalidPhoneNumber:            "無效的手機號碼",
+	StatusQueryRecordExceededLimit:      "查詢筆數超過上限",
+	StatusSMSSizeTooLarge:               "發送檔案過大，無法發送簡訊",
+	StatusParameterError:                "參數錯誤",
+	StatusNoRecord:                      "查無資料",
 	StatusReservationForDelivery:        "預約傳送中",
 	StatusCarrierAccepted:               "已送達業者",
 	StatusCarrierAccepted2:              "已送達業者",
@@ -83,14 +93,14 @@ var statusCodeMap = map[StatusCode]string{
 
 // Message represents an SMS object.
 type Message struct {
-	ID       string `json:"id"`       // Default ID of the message
 	Dstaddr  string `json:"dstaddr"`  // Destination phone number
 	Destname string `json:"destname"` // Destination receiver name
-	Smbody   string `json:"smbody"`   // The text of the message you want to send
 	Dlvtime  string `json:"dlvtime"`  // Optional, Delivery time
 	Vldtime  string `json:"vldtime"`  // Optional
+	Smbody   string `json:"smbody"`   // The text of the message you want to send
 	Response string `json:"response"` // Optional, Callback URL to receive the delivery receipt of the message
-	ClientID string `json:"clientid"` // Optional, an unique identifier from client to identify SMS message
+	ClientID string `json:"clientid"` // Optional (required when bulk send), an unique identifier from client to identify SMS message
+	// ObjectID string `json:"objectID"` // Optional
 }
 
 // ToINI returns the INI format string from the message fields.
@@ -98,26 +108,32 @@ func (m Message) ToINI() string {
 	smbody := strings.Replace(m.Smbody, "\n", string(byte(6)), -1)
 
 	var ini string
-	ini += "dstaddr=" + m.Dstaddr + "\n"
-	ini += "smbody=" + smbody + "\n"
+	ini += "dstaddr=" + m.Dstaddr + "&"
+	ini += "smbody=" + smbody + "&"
+	if m.Destname != "" {
+		ini += "destname=" + m.Destname + "&"
+	}
 	if m.Dlvtime != "" {
-		ini += "dlvtime=" + m.Dlvtime + "\n"
+		ini += "dlvtime=" + m.Dlvtime + "&"
 	}
 	if m.Vldtime != "" {
-		ini += "vldtime=" + m.Vldtime + "\n"
+		ini += "vldtime=" + m.Vldtime + "&"
 	}
 	if m.Response != "" {
-		ini += "response=" + m.Response + "\n"
+		ini += "response=" + m.Response + "&"
 	}
 	if m.ClientID != "" {
-		ini += "ClientID=" + m.ClientID + "\n"
+		ini += "clientid=" + m.ClientID + "&"
 	}
 	return ini
 }
 
-// ToLongMessage returns the format string for Long SMS.
-func (m Message) ToLongMessage() string {
+// ToBatchMessage returns the format string for multiple SMS.
+func (m Message) ToBatchMessage() string {
+	smbody := strings.Replace(m.Smbody, "\n", string(byte(6)), -1)
+
 	var ini string
+	ini += m.ClientID + "$$" // The document says this field is REQUIRED
 	ini += m.Dstaddr + "$$"
 	if m.Dlvtime != "" {
 		ini += m.Dlvtime
@@ -135,15 +151,17 @@ func (m Message) ToLongMessage() string {
 		ini += m.Response
 	}
 	ini += "$$"
-	ini += m.Smbody + "\n"
+	ini += smbody + "\n"
 	return ini
 }
 
 // MessageResult represents result of send SMS.
 type MessageResult struct {
+	ClientID     string     `json:"clientid"`
 	Msgid        string     `json:"msgid"`
 	Statuscode   string     `json:"statuscode"`
 	Statusstring StatusCode `json:"statusstring"`
+	Duplicate    string     `json:"Duplicate"`
 }
 
 // MessageResponse represents response of send SMS.
@@ -166,14 +184,19 @@ func parseMessageResponseByPattern(pattern string, body io.Reader) (*MessageResp
 		if matched, _ := regexp.MatchString(pattern, text); matched {
 			result = new(MessageResult)
 			response.Results = append(response.Results, result)
+			// ClientID
+			re := regexp.MustCompile(pattern)
+			result.ClientID = re.FindStringSubmatch(text)[1]
 		} else {
 			strs := strings.Split(text, "=")
 			switch strs[0] {
 			case "msgid":
 				result.Msgid = strs[1]
 			case "statuscode":
-				result.Statusstring = StatusCode(strs[1])
 				result.Statuscode = strs[1]
+				result.Statusstring = StatusCode(strs[1])
+			case "Duplicate":
+				result.Duplicate = strs[1]
 			case "AccountPoint":
 				response.AccountPoint, _ = strconv.Atoi(strs[1])
 			}
@@ -186,10 +209,6 @@ func parseMessageResponseByPattern(pattern string, body io.Reader) (*MessageResp
 }
 
 func parseMessageResponse(body io.Reader) (*MessageResponse, error) {
-	return parseMessageResponseByPattern(`^\[(.+?)\]$`, body)
-}
-
-func parseLongMessageResponse(body io.Reader) (*MessageResponse, error) {
 	return parseMessageResponseByPattern(`^\[(.+?)\]$`, body)
 }
 
@@ -218,8 +237,8 @@ func parseMessageStatusResponse(body io.Reader) (*MessageStatusResponse, error) 
 		response.Statuses = append(response.Statuses, &MessageStatus{
 			MessageResult: MessageResult{
 				Msgid:        strs[0],
-				Statusstring: StatusCode(strs[1]),
 				Statuscode:   strs[1],
+				Statusstring: StatusCode(strs[1]),
 			},
 			StatusTime: strs[2],
 		})
@@ -243,8 +262,8 @@ func parseCancelMessageStatusResponse(body io.Reader) (*MessageStatusResponse, e
 		response.Statuses = append(response.Statuses, &MessageStatus{
 			MessageResult: MessageResult{
 				Msgid:        strs[0],
-				Statusstring: StatusCode(strs[1]),
 				Statuscode:   strs[1],
+				Statusstring: StatusCode(strs[1]),
 			},
 		})
 	}
