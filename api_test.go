@@ -11,7 +11,7 @@ func TestClient_SendBatch(t *testing.T) {
 	client, mux, teardown := setup()
 	defer teardown()
 
-	mux.HandleFunc("/SmSendPost.asp", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/mtk/SmBulkSend", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "POST")
 		testINI(t, r, `[0]
 dstaddr=0987654321
@@ -30,12 +30,14 @@ AccountPoint=98`)
 
 	messages := []Message{
 		{
-			Dstaddr: "0987654321",
-			Smbody:  "Test 1",
+			ClientID: "0",
+			Dstaddr:  "0987654321",
+			Smbody:   "Test 1",
 		},
 		{
-			Dstaddr: "0987654322",
-			Smbody:  "Test 2",
+			ClientID: "1",
+			Dstaddr:  "0987654322",
+			Smbody:   "Test 2",
 		},
 	}
 
@@ -61,69 +63,11 @@ AccountPoint=98`)
 	}
 }
 
-func TestClient_SendLongMessageBatch(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
-
-	mux.HandleFunc("/SpLmPost", func(w http.ResponseWriter, r *http.Request) {
-		testMethod(t, r, "POST")
-		testINI(t, r, `0aab$$0987654321$$20170101010000$$20170101012300$$Bob$$https://example.com/callback$$Test1
-1aab$$0987654321$$$$$$Bob$$$$Test2`)
-		_, _ = fmt.Fprint(w, `[0aab]
-msgid=#1010079522
-statuscode=1
-[1aab]
-msgid=#1010079523
-statuscode=4
-AccountPoint=98`)
-	})
-
-	messages := []Message{
-		{
-			ID:       "0aab",
-			Destname: "Bob",
-			Dlvtime:  "20170101010000",
-			Vldtime:  "20170101012300",
-			Dstaddr:  "0987654321",
-			Smbody:   "Test1",
-			Response: "https://example.com/callback",
-		},
-		{
-			ID:       "1aab",
-			Destname: "Bob",
-			Dstaddr:  "0987654321",
-			Smbody:   "Test2",
-		},
-	}
-
-	resp, err := client.SendLongMessageBatch(messages)
-
-	if err != nil {
-		t.Errorf("SendLongMessageBatch returned unexpected error: %v", err)
-	}
-
-	want := []*MessageResult{
-		{
-			Msgid:        "#1010079522",
-			Statuscode:   "1",
-			Statusstring: StatusCode("1"),
-		},
-		{
-			Msgid:        "#1010079523",
-			Statuscode:   "4",
-			Statusstring: StatusCode("4"),
-		},
-	}
-	if !reflect.DeepEqual(resp.Results, want) {
-		t.Errorf("SendLongMessageBatch returned %+v, want %+v", resp.Results, want)
-	}
-}
-
 func TestClient_Send(t *testing.T) {
 	client, mux, teardown := setup()
 	defer teardown()
 
-	mux.HandleFunc("/SmSendPost.asp", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/mtk/SmSend", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "POST")
 		testINI(t, r, `[0]
 dstaddr=0987654321
@@ -156,49 +100,11 @@ AccountPoint=99`)
 	}
 }
 
-func TestClient_SendLongMessage(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
-
-	mux.HandleFunc("/SpLmPost", func(w http.ResponseWriter, r *http.Request) {
-		testMethod(t, r, "POST")
-		testINI(t, r, `0aab$$0987654321$$$$$$John$$https://example.com/callback$$Test1`)
-		_, _ = fmt.Fprint(w, `[0aab]
-msgid=#1010079522
-statuscode=1
-AccountPoint=99`)
-	})
-
-	resp, err := client.SendLongMessage(
-		Message{
-			ID:       "0aab",
-			Destname: "John",
-			Dstaddr:  "0987654321",
-			Smbody:   "Test1",
-			Response: "https://example.com/callback",
-		},
-	)
-	if err != nil {
-		t.Errorf("SendLongMessage returned unexpected error: %v", err)
-	}
-
-	want := []*MessageResult{
-		{
-			Msgid:        "#1010079522",
-			Statuscode:   "1",
-			Statusstring: StatusCode("1"),
-		},
-	}
-	if !reflect.DeepEqual(resp.Results, want) {
-		t.Errorf("SendLongMessage returned %+v, want %+v", resp.Results, want)
-	}
-}
-
 func TestClient_QueryAccountPoint(t *testing.T) {
 	client, mux, teardown := setup()
 	defer teardown()
 
-	mux.HandleFunc("/SmQueryGet.asp", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/mtk/SmQuery", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
 		_, _ = fmt.Fprint(w, `AccountPoint=100`)
 	})
@@ -216,7 +122,7 @@ func TestClient_QueryMessageStatus(t *testing.T) {
 	client, mux, teardown := setup()
 	defer teardown()
 
-	mux.HandleFunc("/SmQueryGet.asp", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/mtk/SmQuery", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
 		_, _ = fmt.Fprint(w, `1010079522	1	20170101010010
 1010079523	4	20170101010011`)
@@ -254,7 +160,7 @@ func TestClient_CancelMessage(t *testing.T) {
 	client, mux, teardown := setup()
 	defer teardown()
 
-	mux.HandleFunc("/SmCancel.asp", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/mtk/SmCancel", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
 		_, _ = fmt.Fprint(w, `1010079522=8
 1010079523=9`)

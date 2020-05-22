@@ -10,10 +10,9 @@ import (
 )
 
 const (
-	libraryVersion            = "0.0.1"
-	defaultUserAgent          = "go-mitake/" + libraryVersion
-	defaultBaseURL            = "https://smexpress.mitake.com.tw:9601/"
-	defaultLongMessageBaseURL = "https://smexpress.mitake.com.tw:7102/"
+	libraryVersion   = "2.08.1"
+	defaultUserAgent = "go-mitake/" + libraryVersion
+	defaultBaseURL   = "https://smsapi.mitake.com.tw:443/"
 )
 
 // NewClient returns a new Mitake API client. The username and password are required
@@ -27,15 +26,13 @@ func NewClient(username, password string, httpClient *http.Client) *Client {
 	}
 
 	baseURL, _ := url.Parse(defaultBaseURL)
-	longMessageBaseURL, _ := url.Parse(defaultLongMessageBaseURL)
 
 	return &Client{
-		client:             httpClient,
-		username:           username,
-		password:           password,
-		UserAgent:          defaultUserAgent,
-		BaseURL:            baseURL,
-		LongMessageBaseURL: longMessageBaseURL,
+		client:    httpClient,
+		username:  username,
+		password:  password,
+		UserAgent: defaultUserAgent,
+		BaseURL:   baseURL,
 	}
 }
 
@@ -45,9 +42,8 @@ type Client struct {
 	username string
 	password string
 
-	BaseURL            *url.URL
-	LongMessageBaseURL *url.URL
-	UserAgent          string
+	BaseURL   *url.URL
+	UserAgent string
 }
 
 // checkErrorResponse checks the API response for errors.

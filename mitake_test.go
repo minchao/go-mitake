@@ -24,7 +24,6 @@ func setup() (client *Client, mux *http.ServeMux, teardown func()) {
 	// client is the mitake client being tested.
 	client = NewClient("username", "password", nil)
 	client.BaseURL = baseURL
-	client.LongMessageBaseURL = baseURL
 
 	return client, mux, server.Close
 }
