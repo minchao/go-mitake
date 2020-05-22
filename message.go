@@ -186,11 +186,11 @@ func parseMessageResponseByPattern(pattern string, body io.Reader) (*MessageResp
 }
 
 func parseMessageResponse(body io.Reader) (*MessageResponse, error) {
-	return parseMessageResponseByPattern(`^\[\d+\]$`, body)
+	return parseMessageResponseByPattern(`^\[(.+?)\]$`, body)
 }
 
 func parseLongMessageResponse(body io.Reader) (*MessageResponse, error) {
-	return parseMessageResponseByPattern(`^\[[a-zA-z0-9]+\]$`, body)
+	return parseMessageResponseByPattern(`^\[(.+?)\]$`, body)
 }
 
 // MessageStatus represents status of message.
