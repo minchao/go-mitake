@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	libraryVersion            = "0.0.1"
+	libraryVersion            = "1.0"
 	defaultUserAgent          = "go-mitake/" + libraryVersion
 	defaultBaseURL            = "https://smexpress.mitake.com.tw:9601/"
 	defaultLongMessageBaseURL = "https://smexpress.mitake.com.tw:7102/"
