@@ -1,5 +1,3 @@
-module github.com/minchao/go-mitake
+module github.com/minchao/go-mitake/v2
 
-go 1.13
-
-require golang.org/x/text v0.3.8
+go 1.23

@@ -1,7 +1,0 @@
-linters:
-  # Enabled by default, see https://github.com/golangci/golangci-lint#enabled-by-default-linters
-  enable:
-    - gofmt
-    - goimports
-    - golint
-    - gosec

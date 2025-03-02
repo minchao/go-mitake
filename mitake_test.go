@@ -1,14 +1,17 @@
 package mitake
 
 import (
+	"context"
+	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"reflect"
 	"strings"
 	"testing"
+	"time"
 )
 
 func setup() (client *Client, mux *http.ServeMux, teardown func()) {
@@ -24,7 +27,6 @@ func setup() (client *Client, mux *http.ServeMux, teardown func()) {
 	// client is the mitake client being tested.
 	client = NewClient("username", "password", nil)
 	client.BaseURL = baseURL
-	client.LongMessageBaseURL = baseURL
 
 	return client, mux, server.Close
 }
@@ -35,15 +37,31 @@ func testMethod(t *testing.T, r *http.Request, want string) {
 	}
 }
 
-func testINI(t *testing.T, r *http.Request, want string) {
-	body, err := ioutil.ReadAll(r.Body)
-	if err != nil {
+func testRequestURI(t *testing.T, r *http.Request, want string) {
+	if got := r.RequestURI; got != want {
+		t.Errorf("Request URI is %v, want %v", got, want)
+	}
+}
+
+func testFormData(t *testing.T, r *http.Request, want url.Values) {
+	if err := r.ParseForm(); err != nil {
 		t.Errorf("Request parameters error: %v", err)
+	}
+
+	if got := r.PostForm; !reflect.DeepEqual(got, want) {
+		t.Errorf("Request parameters is %v, want %v", got, want)
+	}
+}
+
+func testData(t *testing.T, r *http.Request, want string) {
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		t.Errorf("Request body error: %v", err)
 	}
 	defer r.Body.Close()
 
 	if got := string(body); got != want {
-		t.Errorf("Request parameters is %v, want %v", got, want)
+		t.Errorf("Request body is %v, want %v", got, want)
 	}
 }
 
@@ -60,13 +78,13 @@ func TestClient_NewRequest(t *testing.T) {
 
 	inURL, outURL := "/foo", defaultBaseURL+"foo"
 	inBody, outBody := "Hello, 世界", "Hello, 世界"
-	req, _ := c.NewRequest("GET", inURL, strings.NewReader(inBody))
+	req, _ := c.NewRequest(context.Background(), "GET", inURL, strings.NewReader(inBody))
 
 	if got, want := req.URL.String(), outURL; got != want {
 		t.Errorf("NewRequest(%q) URL is %v, want %v", inURL, got, want)
 	}
 
-	body, _ := ioutil.ReadAll(req.Body)
+	body, _ := io.ReadAll(req.Body)
 	if got, want := string(body), outBody; got != want {
 		t.Errorf("NewRequest(%q) Body is %v, want %v", inBody, got, want)
 	}
@@ -87,14 +105,14 @@ func TestClient_Do(t *testing.T) {
 		_, _ = fmt.Fprint(w, "Hello, 世界")
 	})
 
-	req, _ := client.NewRequest("GET", "/", nil)
+	req, _ := client.NewRequest(context.Background(), "GET", "/", nil)
 	resp, err := client.Do(req)
 	if err != nil {
 		t.Errorf("Do returned unexpected error: %v", err)
 	}
 	defer resp.Body.Close()
 
-	body, _ := ioutil.ReadAll(resp.Body)
+	body, _ := io.ReadAll(resp.Body)
 
 	want := "Hello, 世界"
 	if !reflect.DeepEqual(string(body), want) {
@@ -110,7 +128,7 @@ func TestClient_Do_httpError(t *testing.T) {
 		http.Error(w, "Bad Request", 400)
 	})
 
-	req, _ := client.NewRequest("GET", "/", nil)
+	req, _ := client.NewRequest(context.Background(), "GET", "/", nil)
 	_, err := client.Do(req)
 
 	if err == nil {
@@ -126,10 +144,29 @@ func TestClient_Do_noContent(t *testing.T) {
 		_, _ = fmt.Fprint(w, "")
 	})
 
-	req, _ := client.NewRequest("GET", "/", nil)
+	req, _ := client.NewRequest(context.Background(), "GET", "/", nil)
 	_, err := client.Do(req)
 
 	if err == nil {
 		t.Error("Expected empty body error.")
+	}
+}
+
+func TestClient_Do_contextWithTimeout(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		time.Sleep(30 * time.Millisecond)
+	})
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Millisecond)
+	defer cancel()
+
+	req, _ := client.NewRequest(ctx, "GET", "/", nil)
+	_, err := client.Do(req)
+
+	if !errors.Is(err, context.DeadlineExceeded) {
+		t.Error("Expected context deadline exceeded error.")
 	}
 }

@@ -1,6 +1,7 @@
 package mitake
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"io"
@@ -10,10 +11,10 @@ import (
 )
 
 const (
-	libraryVersion            = "1.0"
-	defaultUserAgent          = "go-mitake/" + libraryVersion
-	defaultBaseURL            = "https://smexpress.mitake.com.tw:9601/"
-	defaultLongMessageBaseURL = "https://smexpress.mitake.com.tw:7102/"
+	libraryVersion   = "v2"
+	defaultUserAgent = "go-mitake/" + libraryVersion
+	defaultBaseURL   = "https://smsb2c.mitake.com.tw/"
+	defaultEncoding  = "UTF-8"
 )
 
 // NewClient returns a new Mitake API client. The username and password are required
@@ -27,15 +28,13 @@ func NewClient(username, password string, httpClient *http.Client) *Client {
 	}
 
 	baseURL, _ := url.Parse(defaultBaseURL)
-	longMessageBaseURL, _ := url.Parse(defaultLongMessageBaseURL)
 
 	return &Client{
-		client:             httpClient,
-		username:           username,
-		password:           password,
-		UserAgent:          defaultUserAgent,
-		BaseURL:            baseURL,
-		LongMessageBaseURL: longMessageBaseURL,
+		client:    httpClient,
+		username:  username,
+		password:  password,
+		UserAgent: defaultUserAgent,
+		BaseURL:   baseURL,
 	}
 }
 
@@ -45,9 +44,8 @@ type Client struct {
 	username string
 	password string
 
-	BaseURL            *url.URL
-	LongMessageBaseURL *url.URL
-	UserAgent          string
+	BaseURL   *url.URL
+	UserAgent string
 }
 
 // checkErrorResponse checks the API response for errors.
@@ -81,7 +79,7 @@ func (c *Client) Do(req *http.Request) (*http.Response, error) {
 // NewRequest creates an API request. A relative URL can be provided in urlStr,
 // in which case it is resolved relative to the BaseURL of the Client.
 // Relative URLs should always be specified without a preceding slash.
-func (c *Client) NewRequest(method, urlStr string, body io.Reader) (*http.Request, error) {
+func (c *Client) NewRequest(ctx context.Context, method, urlStr string, body io.Reader) (*http.Request, error) {
 	rel, err := url.Parse(urlStr)
 	if err != nil {
 		return nil, err
@@ -89,7 +87,7 @@ func (c *Client) NewRequest(method, urlStr string, body io.Reader) (*http.Reques
 
 	u := c.BaseURL.ResolveReference(rel)
 
-	req, err := http.NewRequest(method, u.String(), body)
+	req, err := http.NewRequestWithContext(ctx, method, u.String(), body)
 	if err != nil {
 		return nil, err
 	}
@@ -101,8 +99,8 @@ func (c *Client) NewRequest(method, urlStr string, body io.Reader) (*http.Reques
 }
 
 // Get method make a GET HTTP request.
-func (c *Client) Get(url string) (*http.Response, error) {
-	req, err := c.NewRequest("GET", url, nil)
+func (c *Client) Get(ctx context.Context, url string) (*http.Response, error) {
+	req, err := c.NewRequest(ctx, "GET", url, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -110,8 +108,8 @@ func (c *Client) Get(url string) (*http.Response, error) {
 }
 
 // Post method make a POST HTTP request.
-func (c *Client) Post(url string, bodyType string, body io.Reader) (*http.Response, error) {
-	req, err := c.NewRequest("POST", url, body)
+func (c *Client) Post(ctx context.Context, url string, bodyType string, body io.Reader) (*http.Response, error) {
+	req, err := c.NewRequest(ctx, "POST", url, body)
 	if err != nil {
 		return nil, err
 	}
@@ -124,5 +122,36 @@ func (c *Client) buildDefaultQuery() url.Values {
 	q := url.Values{}
 	q.Set("username", c.username)
 	q.Set("password", c.password)
-	return q
+	return url.Values{}
+}
+
+// ParameterError represents an error caused by invalid parameters.
+type ParameterError struct {
+	Reason string
+}
+
+func (e *ParameterError) Error() string {
+	return e.Reason
+}
+
+func (e *ParameterError) Is(err error) bool {
+	return e.Error() == err.Error()
+}
+
+// UnexpectedResponseError represents an error caused by unexpected response.
+type UnexpectedResponseError struct {
+	Reason string
+}
+
+func (e *UnexpectedResponseError) Error() string {
+	return e.Reason
+}
+
+func (e *UnexpectedResponseError) Is(err error) bool {
+	return e.Error() == err.Error()
+}
+
+// Ptr returns a pointer to the value passed as argument.
+func Ptr[T any](v T) *T {
+	return &v
 }

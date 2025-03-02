@@ -1,11 +1,10 @@
 # go-mitake
 
 [![GoDoc](https://godoc.org/github.com/minchao/go-mitake?status.svg)](https://godoc.org/github.com/minchao/go-mitake)
-[![Build Status](https://travis-ci.org/minchao/go-mitake.svg?branch=master)](https://travis-ci.org/minchao/go-mitake)
 [![Go Report Card](https://goreportcard.com/badge/github.com/minchao/go-mitake)](https://goreportcard.com/report/github.com/minchao/go-mitake)
 [![codecov](https://codecov.io/gh/minchao/go-mitake/branch/master/graph/badge.svg)](https://codecov.io/gh/minchao/go-mitake)
 
-go-mitake is a Go client library for accessing the [Mitake SMS](https://sms.mitake.com.tw/) API (Taiwan mobile phone number only).
+go-mitake is a Go client library for accessing the [Mitake SMS](https://sms.mitake.com.tw/) v2 API (Taiwan mobile phone number only).
 
 ## Installation
 
@@ -16,7 +15,7 @@ go get -u github.com/minchao/go-mitake
 ## Usage
 
 ```go
-import "github.com/minchao/go-mitake"
+import "github.com/minchao/go-mitake/v2"
 ```
 
 Construct a new Mitake SMS client, then use to access the Mitake API. For example:
@@ -25,50 +24,54 @@ Construct a new Mitake SMS client, then use to access the Mitake API. For exampl
 client := mitake.NewClient("USERNAME", "PASSWORD", nil)
 
 // Retrieving your account balance
-balance, err := client.QueryAccountPoint()
+balance, err := client.QueryAccountPoint(context.Background())
 ```
 
 Send an SMS:
 
 ```go
-message := mitake.Message{
-    Dstaddr: "0987654321",
-    Smbody:  "Message ...",
+message := mitake.MessageParams{
+    Message: Message{
+        Dstaddr: "0987654321",
+        Smbody:  "Message ...",
+	},
 }
 
-response, err := client.Send(message)
+response, err := client.Send(context.Background(), message)
 ```
 
 Send multiple SMS:
 
 ```go
-messages := []mitake.Message{
-    {
-        Dstaddr: "0987654321",
-        Smbody:  "Message ...",
-    },
-    // ...
+messages := mitake.BatchMessagesParams{
+	Messages: []mitake.Message{
+        {
+		    ClientID: "0aab",
+            Dstaddr: "0987654321",
+            Smbody:  "Message ...",
+        },
+        // ...
+	},
 }
 
-response, err := client.SendBatch(messages)
-```
-
-Send an long SMS:
-
-```go
-message := mitake.Message{
-    Dstaddr: "0987654321",
-    Smbody:  "Long message ...",
-}
-
-response, err := client.SendLongMessage(message)
+response, err := client.SendBatch(context.Background(), messages)
 ```
 
 Query the status of messages:
 
 ```go
-response, err := client.QueryMessageStatus([]string{"MESSAGE_ID1", "MESSAGE_ID2"})
+messages := mitake.MessageStatusParams{
+    MessageIDs: []string{"MESSAGE_ID1", "MESSAGE_ID2"},
+}
+
+response, err := client.QueryMessageStatus(context.Background(), messages)
 ```
+
+Cancel the scheduled message:
+
+```go
+resp, err := client.CancelScheduledMessages(context.Background(), []string{"MESSAGE_ID1", "MESSAGE_ID2"})
+````
 
 Use webhook to receive the delivery receipts of the messages:
 

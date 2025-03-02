@@ -1,11 +1,12 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"os"
 
-	"github.com/minchao/go-mitake"
+	"github.com/minchao/go-mitake/v2"
 )
 
 func usage() {
@@ -36,14 +37,18 @@ func main() {
 
 	client := mitake.NewClient(username, password, nil)
 
-	resp, err := client.Send(mitake.Message{
-		Dstaddr: to,
-		Smbody:  message,
-	})
+	resp, err := client.Send(context.Background(),
+		mitake.MessageParams{
+			Message: mitake.Message{
+				Dstaddr: to,
+				Smbody:  message,
+			},
+		},
+	)
 	if err != nil {
 		_, _ = fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 
-	_, _ = fmt.Fprintf(os.Stdout, "result: %+v\n", resp.INI)
+	_, _ = fmt.Fprintf(os.Stdout, "result: %+v\n", resp)
 }
