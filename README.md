@@ -1,7 +1,8 @@
 # go-mitake
 
 [![GoDoc](https://godoc.org/github.com/minchao/go-mitake?status.svg)](https://godoc.org/github.com/minchao/go-mitake)
-[![Go Report Card](https://goreportcard.com/badge/github.com/minchao/go-mitake)](https://goreportcard.com/report/github.com/minchao/go-mitake)
+[![Go Report Card](https://goreportcard.com/badge/github.com/minchao/go-mitake/v2)](https://goreportcard.com/report/github.com/minchao/go-mitake/v2)
+[![Continuous Integration](https://github.com/minchao/go-mitake/actions/workflows/continuous-integration.yaml/badge.svg?branch=master)](https://github.com/minchao/go-mitake/actions/workflows/continuous-integration.yaml)
 [![codecov](https://codecov.io/gh/minchao/go-mitake/branch/master/graph/badge.svg)](https://codecov.io/gh/minchao/go-mitake)
 
 go-mitake is a Go client library for accessing the [Mitake SMS](https://sms.mitake.com.tw/) v2 API (Taiwan mobile phone number only).
@@ -9,7 +10,7 @@ go-mitake is a Go client library for accessing the [Mitake SMS](https://sms.mita
 ## Installation
 
 ```bash
-go get -u github.com/minchao/go-mitake
+go get -u github.com/minchao/go-mitake/v2
 ```
 
 ## Usage
